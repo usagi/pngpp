@@ -1,0 +1,5 @@
+- add io_transforms for png::writer
+- support for non-8bit data
+- stream exceptions?
+- adjust png::image for non-memory back end buffer + row-by-row io
+- use doxygen

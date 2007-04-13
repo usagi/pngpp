@@ -1,0 +1,30 @@
+This is png++ the C++ wrapper for libpng.  Version 0.1.1          -*- text -*-
+
+The png++ aims to provide simple yet powerful C++ interface to the nice
+libpng, the PNG reference implementation library.
+
+Png++ is free software distributed under a modified variant of BSD license.
+For more details please refer to file COPYING in this directory.
+
+Using raw libpng in C++ may impose serious challenge since lots of precautions
+must be taken to handle initialization/deinitialization of control structures
+as well as handling errors correctly.
+
+The sample routine to a read PNG image in libpng's example is about 300 lines
+in C.  With png++ you can read or write PNG images just in a single line of
+C++ code:
+
+png::image< png::rgb_pixel > my_image("myimage.png");
+my_image.write("myimage2.png");
+
+In this example png++ does all the transformations needed to create adequate
+in-memory RGB representation of the image.  Thus, myimage.png can be RGB
+image, or it might be grayscale or even indexed image with a palette.
+
+Currently you can only load the whole image in memory, but means to process
+images line by line are scheduled to be added soon.
+
+
+Happy hacking!
+--
+Alex Shulgin  (see AUTHORS file for e-mail)
