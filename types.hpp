@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2007   Alex Shulgin
  *
  * This file is part of png++ the C++ wrapper for libpng.  Png++ is free
@@ -31,6 +31,8 @@
 #ifndef PNGPP_TYPES_HPP_INCLUDED
 #define PNGPP_TYPES_HPP_INCLUDED
 
+#include <png.h>
+
 namespace png
 {
 
@@ -38,10 +40,12 @@ namespace png
     typedef png_uint_16 uint_16;
     typedef png_uint_32 uint_32;
     typedef png_fixed_point fixed_point;
-    typedef png_color_8 color;
+    typedef png_color_8 color_info;
+    typedef png_color_16 color_info_16;
 
     enum color_type
     {
+        color_type_none       = -1,
         color_type_gray       = PNG_COLOR_TYPE_GRAY,
         color_type_palette    = PNG_COLOR_TYPE_PALETTE,
         color_type_rgb        = PNG_COLOR_TYPE_RGB,
@@ -55,6 +59,7 @@ namespace png
     {
         color_mask_palette = PNG_COLOR_MASK_PALETTE,
         color_mask_color   = PNG_COLOR_MASK_COLOR,
+        color_mask_rgb     = color_mask_color,
         color_mask_alpha   = PNG_COLOR_MASK_ALPHA
     };
 
@@ -88,6 +93,26 @@ namespace png
         filter_type_base        = PNG_FILTER_TYPE_BASE,
         intrapixel_differencing = PNG_INTRAPIXEL_DIFFERENCING,
         filter_type_default     = PNG_FILTER_TYPE_DEFAULT
+    };
+
+    enum chunk
+    {
+        chunk_gAMA = PNG_INFO_gAMA,
+        chunk_sBIT = PNG_INFO_sBIT,
+        chunk_cHRM = PNG_INFO_cHRM,
+        chunk_PLTE = PNG_INFO_PLTE,
+        chunk_tRNS = PNG_INFO_tRNS,
+        chunk_bKGD = PNG_INFO_bKGD,
+        chunk_hIST = PNG_INFO_hIST,
+        chunk_pHYs = PNG_INFO_pHYs,
+        chunk_oFFs = PNG_INFO_oFFs,
+        chunk_tIME = PNG_INFO_tIME,
+        chunk_pCAL = PNG_INFO_pCAL,
+        chunk_sRGB = PNG_INFO_sRGB,
+        chunk_iCCP = PNG_INFO_iCCP,
+        chunk_sPLT = PNG_INFO_sPLT,
+        chunk_sCAL = PNG_INFO_sCAL,
+        chunk_IDAT = PNG_INFO_IDAT
     };
 
 } // namespace png

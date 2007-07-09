@@ -1,5 +1,13 @@
+png++-0.2.0	08 Jul 2007
+
+	Major internal code refactoring.  Added support for non-8-bit
+	data, row-by-row IO, added docs, test suite and more.  Fixed some
+	bugs including interlace handling.
+
 png++-0.1.1	07 Apr 2007
+
 	Added appropriate copyright notices.
 
 png++-0.1.0	04 Feb 2007
+
 	Initial release.

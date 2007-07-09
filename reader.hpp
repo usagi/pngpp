@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2007   Alex Shulgin
  *
  * This file is part of png++ the C++ wrapper for libpng.  Png++ is free
@@ -38,10 +38,21 @@
 namespace png
 {
 
+    /**
+     * \brief The PNG reader class.  This is the low-level reading
+     * interface -- use image class or consumer class to actually read
+     * images.
+     *
+     * \see image, consumer, writer, io_base
+     */
     class reader
         : public io_base
     {
     public:
+        /**
+         * \brief Constructs a reader prepared to read PNG image from
+         * a \a stream.
+         */
         explicit reader(std::istream& stream)
             : io_base(png_create_read_struct(PNG_LIBPNG_VER_STRING,
                                              static_cast< io_base* >(this),
@@ -51,26 +62,33 @@ namespace png
             png_set_read_fn(m_png, & stream, read_data);
         }
 
-        ~reader(void)
+        ~reader()
         {
-            m_info.destroy();
-            m_end_info.destroy();
-            png_destroy_read_struct(& m_png, 0, 0);
+            png_destroy_read_struct(& m_png,
+                                    m_info.get_png_info_ptr(),
+                                    m_end_info.get_png_info_ptr());
         }
 
-        void read_png(void)
+        /**
+         * \brief Reads the whole PNG data stream into memory.  Not
+         * particularly useful.
+         */
+        void read_png()
         {
             if (setjmp(m_png->jmpbuf))
             {
                 throw error(m_error);
             }
             png_read_png(m_png,
-                         m_info.get_png_struct(),
+                         m_info.get_png_info(),
                          /* transforms = */ 0,
                          /* params = */ 0);
         }
 
-        void read_info(void)
+        /**
+         * \brief Reads info about PNG image.
+         */
+        void read_info()
         {
             if (setjmp(m_png->jmpbuf))
             {
@@ -79,35 +97,22 @@ namespace png
             m_info.read();
         }
 
-        template< typename pixbuf >
-        void read_image(pixbuf& buf)
+        /**
+         * \brief Reads a row of image data at a time.
+         */
+        void read_row(byte* bytes)
         {
             if (setjmp(m_png->jmpbuf))
             {
                 throw error(m_error);
             }
-#ifdef PNG_READ_INTERLACING_SUPPORTED
-            int pass = set_interlace_handling();
-#else
-            if (m_png->interlaced)
-            {
-                throw error("Cannot read interlaced image"
-                            " -- interlace handling disabled.");
-            }
-            int pass = 1;
-#endif
-            while (pass-- > 0)
-            {
-                for (size_t row = 0; row < buf.get_height(); ++row)
-                {
-                    byte* pixels
-                        = reinterpret_cast< byte* >(& buf.get_row(row).at(0));
-                    png_read_row(m_png, pixels, 0);
-                }
-            }
+            png_read_row(m_png, bytes, 0);
         }
 
-        void read_end_info(void)
+        /**
+         * \brief Reads endinig info about PNG image.
+         */
+        void read_end_info()
         {
             if (setjmp(m_png->jmpbuf))
             {
@@ -116,7 +121,7 @@ namespace png
             m_end_info.read();
         }
 
-        void update_info(void)
+        void update_info()
         {
             m_info.update();
         }
@@ -143,7 +148,8 @@ namespace png
             }
             catch (...)
             {
-                assert(!"caught something wrong");
+                assert(!"read_data: caught something wrong");
+                rd->set_error("read_data: caught something wrong");
             }
             if (rd->is_error())
             {

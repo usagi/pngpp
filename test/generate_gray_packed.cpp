@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2007   Alex Shulgin
  *
  * This file is part of png++ the C++ wrapper for libpng.  Png++ is free
@@ -28,20 +28,43 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef PNGPP_IO_TRANSFORM_HPP_INCLUDED
-#define PNGPP_IO_TRANSFORM_HPP_INCLUDED
+#include <iostream>
+#include <ostream>
 
-#include "io_base.hpp"
+#include <png.hpp>
 
-namespace png
+template< class pixel >
+void
+generate_image(png::image< pixel >& image, char const* filename)
 {
-
-    class io_transform
+    for (size_t j = 0; j < image.get_height(); ++j)
     {
-    public:
-        void operator()(io_base& io) const;
-    };
+        for (size_t i = 0; i < image.get_width(); ++i)
+        {
+            image.set_pixel(i, j, pixel(i + j));
+        }
+    }
+    image.write(filename);
+}
 
-} // namespace png
+int
+main(int argc, char* argv[])
+try
+{
+    size_t const width = 32;
+    size_t const height = 32;
 
-#endif // PNGPP_IO_TRANSFORM_HPP_INCLUDED
+    png::image< png::gray_pixel_1 > image1(width, height);
+    generate_image(image1, "gray_packed_1.png.out");
+
+    png::image< png::gray_pixel_2 > image2(width, height);
+    generate_image(image2, "gray_packed_2.png.out");
+
+    png::image< png::gray_pixel_4 > image4(width, height);
+    generate_image(image4, "gray_packed_4.png.out");
+}
+catch (std::exception const& error)
+{
+    std::cerr << "generate_gray_packed: " << error.what() << std::endl;
+    return EXIT_FAILURE;
+}

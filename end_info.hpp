@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2007   Alex Shulgin
  *
  * This file is part of png++ the C++ wrapper for libpng.  Png++ is free
@@ -36,24 +36,37 @@
 namespace png
 {
 
+    /**
+     * \brief Internal class to hold PNG ending %info.
+     *
+     * \see info, info_base
+     */
     class end_info
         : public info_base
     {
     public:
-        explicit end_info(png_struct* png)
-            : info_base(png)
+        end_info(io_base& io, png_struct* png)
+            : info_base(io, png)
         {
         }
 
-        void read(void)
+        void destroy()
+        {
+            assert(m_info);
+            png_destroy_info_struct(m_png, & m_info);
+        }
+
+        void read()
         {
             png_read_end(m_png, m_info);
         }
         
-        void write(void) const
+        void write() const
         {
             png_write_end(m_png, m_info);
         }
+
+        // TODO: add methods to read/write text comments etc.
     };
 
 } // namespace png

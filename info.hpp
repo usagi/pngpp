@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2007   Alex Shulgin
  *
  * This file is part of png++ the C++ wrapper for libpng.  Png++ is free
@@ -33,121 +33,86 @@
 
 #include <cassert>
 #include "info_base.hpp"
+#include "image_info.hpp"
 
 namespace png
 {
 
+    /**
+     * \brief Holds information about PNG image.  Adapter class for IO
+     * image operations.
+     */
     class info
-        : public info_base
+        : public info_base,
+          public image_info
     {
     public:
-        explicit info(png_struct* png)
-            : info_base(png)
+        info(io_base& io, png_struct* png)
+            : info_base(io, png)
         {
         }
 
-        void read(void)
-        {
-            png_read_info(m_png, m_info);
-        }
-
-        void write(void) const
-        {
-            png_write_info(m_png, m_info);
-        }
-
-        void update(void)
+        void read()
         {
             assert(m_png);
             assert(m_info);
+
+            png_read_info(m_png, m_info);
+            png_get_IHDR(m_png,
+                         m_info,
+                         & m_width,
+                         & m_height,
+                         reinterpret_cast< int* >(& m_bit_depth),
+                         reinterpret_cast< int* >(& m_color_type),
+                         reinterpret_cast< int* >(& m_interlace_type),
+                         reinterpret_cast< int* >(& m_compression_type),
+                         reinterpret_cast< int* >(& m_filter_type));
+
+            if (png_get_valid(m_png, m_info, chunk_PLTE) == chunk_PLTE)
+            {
+                png_color* colors = 0;
+                int count = 0;
+                png_get_PLTE(m_png, m_info, & colors, & count);
+                m_palette.assign(colors, colors + count);
+            }
+        }
+
+        void write() const
+        {
+            assert(m_png);
+            assert(m_info);
+
+            sync_ihdr();
+            if (! m_palette.empty())
+            {
+                png_set_PLTE(m_png, m_info,
+                             const_cast< color* >(& m_palette[0]),
+                             m_palette.size());
+            }
+            png_write_info(m_png, m_info);
+        }
+
+        void update()
+        {
+            assert(m_png);
+            assert(m_info);
+
+            sync_ihdr();
             png_read_update_info(m_png, m_info);
         }
 
-        size_t get_width(void) const
-        {
-            assert(m_info);
-            return m_info->width;
-        }
-        
-        size_t get_height(void) const
-        {
-            assert(m_info);
-            return m_info->height;
-        }
-
-        color_type get_color_type(void) const
-        {
-            assert(m_info);
-            return color_type(m_info->color_type);
-        }
-
-        int get_bit_depth(void) const
-        {
-            assert(m_info);
-            return m_info->bit_depth;
-        }
-
-        struct header
-        {
-        public:
-            explicit header(uint_32 width = 0,
-                            uint_32 height = 0,
-                            int bit_depth = 0,
-                            color_type color = color_type_gray,
-                            interlace_type interlace = interlace_none,
-                            compression_type compression
-                            = compression_type_default,
-                            filter_type filter = filter_type_default)
-                : width(width),
-                  height(height),
-                  bit_depth(bit_depth),
-                  color(color),
-                  interlace(interlace),
-                  compression(compression),
-                  filter(filter)
-            {
-            }
-
-            uint_32 width;
-            uint_32 height;
-            int bit_depth;
-            color_type color;
-            interlace_type interlace;
-            compression_type compression;
-            filter_type filter;
-        };
-
-        header get_header(void) const
-        {
-            header hdr;
-            get_header(hdr);
-            return hdr;
-        }
-
-        void get_header(header& hdr) const
-        {
-            png_get_IHDR(m_png,
-                         m_info,
-                         & hdr.width,
-                         & hdr.height,
-                         & hdr.bit_depth,
-                         reinterpret_cast< int* >(& hdr.color),
-                         reinterpret_cast< int* >(& hdr.interlace),
-                         reinterpret_cast< int* >(& hdr.compression),
-                         reinterpret_cast< int* >(& hdr.filter));
-        }
-
-        void set_header(header const& hdr)
+    protected:
+        void sync_ihdr(void) const
         {
             png_set_IHDR(m_png,
                          m_info,
-                         hdr.width,
-                         hdr.height,
-                         hdr.bit_depth,
-                         hdr.color,
-                         hdr.interlace,
-                         hdr.compression,
-                         hdr.filter);
+                         m_width,
+                         m_height,
+                         m_bit_depth,
+                         m_color_type,
+                         m_interlace_type,
+                         m_compression_type,
+                         m_filter_type);
         }
     };
 

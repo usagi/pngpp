@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2007   Alex Shulgin
  *
  * This file is part of png++ the C++ wrapper for libpng.  Png++ is free
@@ -38,10 +38,21 @@
 namespace png
 {
 
+    /**
+     * \brief PNG writer class.  This is the low-level writing
+     * interface -- use image class or generator class to actually
+     * write images.
+     *
+     * \see image, reader, generator, io_base
+     */
     class writer
         : public io_base
     {
     public:
+        /**
+         * \brief Constructs a writer prepared to write PNG image into
+         * a \a stream.
+         */
         explicit writer(std::ostream& stream)
             : io_base(png_create_write_struct(PNG_LIBPNG_VER_STRING,
                                               static_cast< io_base* >(this),
@@ -51,26 +62,28 @@ namespace png
             png_set_write_fn(m_png, & stream, write_data, flush_data);
         }
 
-        ~writer(void)
+        ~writer()
         {
-            m_info.destroy();
             m_end_info.destroy();
-            png_destroy_write_struct(& m_png, 0);
+            png_destroy_write_struct(& m_png, m_info.get_png_info_ptr());
         }
 
-        void write_png(void) const
+        void write_png() const
         {
             if (setjmp(m_png->jmpbuf))
             {
                 throw error(m_error);
             }
             png_write_png(m_png,
-                          m_info.get_png_struct(),
+                          m_info.get_png_info(),
                           /* transforms = */ 0,
                           /* params = */ 0);
         }
 
-        void write_info(void) const
+        /**
+         * \brief Write info about PNG image.
+         */
+        void write_info() const
         {
             if (setjmp(m_png->jmpbuf))
             {
@@ -79,30 +92,22 @@ namespace png
             m_info.write();
         }
 
-        template< typename pixbuf >
-        void write_image(pixbuf& buf) const
+        /**
+         * \brief Writes a row of image data at a time.
+         */
+        void write_row(byte* bytes)
         {
             if (setjmp(m_png->jmpbuf))
             {
                 throw error(m_error);
             }
-#ifdef PNG_WRITE_INTERLACING_SUPPORTED
-            int pass = set_interlace_handling();
-#else
-            int pass = 1;
-#endif
-            while (pass-- > 0)
-            {
-                for (size_t row = 0; row < buf.get_height(); ++row)
-                {
-                    byte* pixels
-                        = reinterpret_cast< byte* >(& buf.get_row(row).at(0));
-                    png_write_row(m_png, pixels);
-                }
-            }
+            png_write_row(m_png, bytes);
         }
 
-        void write_end_info(void) const
+        /**
+         * \brief Reads ending info about PNG image.
+         */
+        void write_end_info() const
         {
             if (setjmp(m_png->jmpbuf))
             {
@@ -134,6 +139,7 @@ namespace png
             catch (...)
             {
                 assert(!"caught something wrong");
+                wr->set_error("write_data: caught something wrong");
             }
             if (wr->is_error())
             {
@@ -163,6 +169,7 @@ namespace png
             catch (...)
             {
                 assert(!"caught something wrong");
+                wr->set_error("flush_data: caught something wrong");
             }
             if (wr->is_error())
             {

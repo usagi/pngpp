@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2007   Alex Shulgin
  *
  * This file is part of png++ the C++ wrapper for libpng.  Png++ is free
@@ -37,38 +37,59 @@
 namespace png
 {
 
-    struct rgba_pixel
+    /**
+     * \brief RGBA pixel type.
+     */
+    template< typename T >
+    struct basic_rgba_pixel
     {
-        explicit rgba_pixel(byte red   = 0,
-                            byte green = 0,
-                            byte blue  = 0,
-                            byte alpha = 0)
-            : red(red),
-              green(green),
-              blue(blue),
-              alpha(alpha)
+        typedef pixel_traits< basic_rgba_pixel< T > > traits;
+
+        /**
+         * \brief Default constructor.  Initializes all components
+         * with zeros.
+         */
+        basic_rgba_pixel()
+            : red(0), green(0), blue(0), alpha(0)
         {
         }
 
-        byte red;
-        byte green;
-        byte blue;
-        byte alpha;
+        /**
+         * \brief Constructs rgba_pixel object from \a red, \a green,
+         * \a blue and \a alpha components passed as parameters.
+         * Alpha defaults to full opacity.
+         */
+        basic_rgba_pixel(T red, T green, T blue,
+                         T alpha = traits::get_alpha_filler())
+            : red(red), green(green), blue(blue), alpha(alpha)
+        {
+        }
+
+        T red;
+        T green;
+        T blue;
+        T alpha;
     };
 
-    template<>
-    inline int
-    pixel_traits< rgba_pixel >::get_bit_depth(void)
-    {
-        return 8;
-    }
+    /**
+     * The 8-bit RGBA pixel type.
+     */
+    typedef basic_rgba_pixel< byte > rgba_pixel;
 
-    template<>
-    inline color_type
-    pixel_traits< rgba_pixel >::get_color_type(void)
+    /**
+     * The 16-bit RGBA pixel type.
+     */
+    typedef basic_rgba_pixel< uint_16 > rgba_pixel_16;
+
+    /**
+     * \brief Pixel traits specialization for basic_rgba_pixel.
+     */
+    template< typename T >
+    struct pixel_traits< basic_rgba_pixel< T > >
+        : basic_pixel_traits< basic_rgba_pixel< T >, T, color_type_rgba >,
+          basic_alpha_pixel_traits< T >
     {
-        return color_type_rgba;
-    }
+    };
 
 } // namespace png
 

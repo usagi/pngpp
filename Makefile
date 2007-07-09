@@ -28,7 +28,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-version := 0.1.1
+version := 0.2.0
 
 ifndef PREFIX
 PREFIX := /usr/local
@@ -46,45 +46,93 @@ make_cflags := $(make_cflags) -g
 make_ldflags := $(make_ldflags) -g
 endif
 
-ifndef libpng_config
-libpng_config := libpng-config
+ifndef LIBPNG_CONFIG
+LIBPNG_CONFIG := libpng-config
 endif
 
-build_files := Makefile
-info_files := AUTHORS COPYING INSTALL README TODO
-header_files := *.hpp
-source_files := pngpptest.cpp
-test_files := test/
-dist_files := $(build_files) $(info_files) \
-  $(header_files) $(source_files) \
-  $(test_files)
+build_files := Makefile Doxyfile
+doc_files := AUTHORS BUGS ChangeLog COPYING INSTALL NEWS README TODO
+headers := *.hpp
+sources :=
 
+dist_dir := png++-$(version)
+dist_package := png++-$(version).tar.gz
+dist_files := $(build_files) $(doc_files) \
+  $(headers) $(sources)
+dist_subdirs := example test
 
-target_test := pngpptest$(bin_suffix)
-targets := $(target_test)
+all: examples
 
-all: $(targets)
+install: install-headers install-docs
 
-install:
+install-headers:
 	mkdir -p $(PREFIX)/include/png++
 	cp *.hpp $(PREFIX)/include/png++
 
-dist:
-	tar -zcf png++-$(version).tar.gz --exclude=.svn $(dist_files)
+dist: dist-mkdir dist-copy-files dist-package
 
-clean:
-	rm -f $(targets)
+dist-mkdir:
+	rm -rf $(dist_dir)
+	mkdir $(dist_dir)
 
-thorough-clean: clean test-clean
+dist-copy-files:
+	cp $(dist_files) $(dist_dir)
+	for i in $(dist_subdirs); do \
+		$(MAKE) dist-copy-files -C $$i $(MAKEFLAGS) \
+		  dist_dir=`pwd`/$(dist_dir); \
+	done
 
-test: $(target_test)
-	./$(target_test) test/*.png
+dist-package:
+	rm -f $(dist_package)
+	tar -zcf $(dist_package) $(dist_dir) --exclude=.svn --exclude='*~'
+	rm -rf $(dist_dir)
+
+clean: test-clean examples-clean
+#	rm -f $(targets)
+
+thorough-clean: clean docs-clean
+
+check: test
+
+test:
+	$(MAKE) test -C test $(MAKEFLAGS) PNGPP=`pwd`
 
 test-clean:
-	rm -f *.png
+	$(MAKE) clean -C test $(MAKEFLAGS)
 
-.PHONY: all install dist clean thorough-clean test test-clean
+test-compile-headers: *.hpp
+	for i in *.hpp; do \
+		echo '#include "'$$i'"' >$$i.cpp \
+		&& g++ -c $$i.cpp $(make_cflags) `$(LIBPNG_CONFIG) --cflags`; \
+	done
+	rm -f *.hpp.o *.hpp.cpp
 
-$(target_test): pngpptest.cpp *.hpp Makefile
-	g++ -o $@ $< $(make_cflags) $(make_ldflags) \
-	  `$(libpng_config) --cflags --ldflags --libs`
+docs:
+	doxygen
+
+docs-clean:
+	rm -rf doc
+
+install-docs:
+	if [ -d doc ]; then \
+		dir=$(PREFIX)/share/doc/$(dist_dir); \
+		rm -rf $$dir; \
+		mkdir -p $$dir \
+		&& cp -r $(doc_files) doc/html $$dir; \
+		cd $(PREFIX)/share/doc; \
+		[ -L png++ ] && rm png++; \
+		[ -d png++ ] || ln -s $(dist_dir) png++; \
+	fi
+
+examples:
+	$(MAKE) -C example $(MAKEFLAGS)
+
+examples-clean:
+	$(MAKE) clean -C example $(MAKEFLAGS)
+
+.PHONY: all install \
+  dist dist-mkdir dist-copy-files dist-package \
+  clean thorough-clean \
+  check test test-clean test-compile-headers \
+  docs docs-clean \
+  examples examples-clean

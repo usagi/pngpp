@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2007   Alex Shulgin
  *
  * This file is part of png++ the C++ wrapper for libpng.  Png++ is free
@@ -33,87 +33,161 @@
 
 #include <fstream>
 #include "pixel_buffer.hpp"
-#include "reader.hpp"
-#include "writer.hpp"
+#include "generator.hpp"
+#include "consumer.hpp"
 #include "convert_color_space.hpp"
 
 namespace png
 {
 
-    template< typename pixel,
-              class traits = pixel_traits< pixel >,
-              class pixbuf = pixel_buffer< pixel > >
+    /**
+     * \brief Class template to represent PNG image.
+     *
+     * The image consists of pixel data as well as additional %image
+     * %info like interlace type, compression method, palette (for
+     * colormap-based images) etc.  Provides methods to read and write
+     * images from/to a generic stream and to manipulate %image pixels.
+     */
+    template< typename pixel >
     class image
     {
     public:
-        typedef typename pixbuf::row row;
+        /**
+         * \brief The pixel traits type for \c pixel.
+         */
+        typedef pixel_traits< pixel > traits;
+
+        /**
+         * \brief The pixel buffer type for \c pixel.
+         */
+        typedef pixel_buffer< pixel > pixbuf;
+
+        /**
+         * \brief Represents a row of image pixel data.
+         */
+        typedef typename pixbuf::row_type row_type;
+
+        /**
+         * \brief A transformation functor to convert any image to
+         * appropriate color space.
+         */
         typedef convert_color_space< pixel > transform_convert;
 
-        image(void)
+        /**
+         * \brief The default io transformation: does nothing.
+         */
+        struct transform_identity
+        {
+            void operator()(io_base&) const {}
+        };
+
+        /**
+         * \brief Constructs an empty image.
+         */
+        image()
+            : m_info(make_image_info< pixel >())
         {
         }
 
+        /**
+         * \brief Constructs an empty image of specified width and height.
+         */
         image(size_t width, size_t height)
-            : m_pixbuf(width, height)
+            : m_info(make_image_info< pixel >())
         {
+            resize(width, height);
         }
 
-        //////////////////////////////////////////////////////////////////////
-        // reading constructors
-        //
+        /**
+         * \brief Constructs an image reading data from specified file
+         * using default converting transform.
+         */
         explicit image(std::string const& filename)
         {
             read(filename, transform_convert());
         }
 
+        /**
+         * \brief Constructs an image reading data from specified file
+         * using custom transformaton.
+         */
         template< class transformation >
-        explicit image(std::string const& filename,
-                       transformation const& transform)
+        image(std::string const& filename,
+              transformation const& transform)
         {
             read(filename.c_str(), transform);
         }
 
+        /**
+         * \brief Constructs an image reading data from specified file
+         * using default converting transform.
+         */
         explicit image(char const* filename)
         {
             read(filename, transform_convert());
         }
 
+        /**
+         * \brief Constructs an image reading data from specified file
+         * using custom transformaton.
+         */
         template< class transformation >
-        explicit image(char const* filename, transformation const& transform)
+        image(char const* filename, transformation const& transform)
         {
             read(filename, transform);
         }
 
+        /**
+         * \brief Constructs an image reading data from a stream using
+         * default converting transform.
+         */
         explicit image(std::istream& stream)
         {
             read(stream, transform_convert());
         }
 
+        /**
+         * \brief Constructs an image reading data from a stream using
+         * custom transformation.
+         */
         template< class transformation >
-        explicit image(std::istream& stream, transformation const& transform)
+        image(std::istream& stream, transformation const& transform)
         {
             read(stream, transform);
         }
 
-        //////////////////////////////////////////////////////////////////////
-        // io methods
-        //
+        /**
+         * \brief Reads an image from specified file using default
+         * converting transform.
+         */
         void read(std::string const& filename)
         {
             read(filename, transform_convert());
         }
 
+        /**
+         * \brief Reads an image from specified file using custom
+         * transformaton.
+         */
         template< class transformation >
         void read(std::string const& filename, transformation const& transform)
         {
             read(filename.c_str(), transform);
         }
 
+        /**
+         * \brief Reads an image from specified file using default
+         * converting transform.
+         */
         void read(char const* filename)
         {
             read(filename, transform_convert());
         }
 
+        /**
+         * \brief Reads an image from specified file using custom
+         * transformaton.
+         */
         template< class transformation >
         void read(char const* filename, transformation const& transform)
         {
@@ -122,34 +196,41 @@ namespace png
             {
                 throw std_error(filename);
             }
-            // FIXME: stream.exceptions(std::ios::badbit | std::ios::failbit);
+            stream.exceptions(std::ios::badbit);
             read(stream, transform);
         }
 
+        /**
+         * \brief Reads an image from a stream using default
+         * converting transform.
+         */
         void read(std::istream& stream)
         {
             read(stream, transform_convert());
         }
 
+        /**
+         * \brief Reads an image from a stream using custom
+         * transformation.
+         */
         template< class transformation >
         void read(std::istream& stream, transformation const& transform)
         {
-            reader rd(stream);
-            rd.read_info();
-            transform(rd);
-            rd.update_info();
-            rd.get_header(m_info_header);
-            m_pixbuf.resize(rd.get_width(), rd.get_height());
-            rd.read_image(m_pixbuf);
-            rd.read_end_info();
+            pixel_consumer pixcon(m_info, m_pixbuf);
+            pixcon.read(stream, transform);
         }
 
-        // no `const' write methods due to non-const buffer in `png_write_row'
+        /**
+         * \brief Writes an image to specified file.
+         */
         void write(std::string const& filename)
         {
             write(filename.c_str());
         }
 
+        /**
+         * \brief Writes an image to specified file.
+         */
         void write(char const* filename)
         {
             std::ofstream stream(filename, std::ios::binary);
@@ -157,81 +238,249 @@ namespace png
             {
                 throw std_error(filename);
             }
-            // FIXME: stream.exceptions(std::ios::badbit | std::ios::failbit);
+            stream.exceptions(std::ios::badbit);
             write(stream);
         }
 
+        /**
+         * \brief Writes an image to a stream.
+         */
         void write(std::ostream& stream)
         {
-            writer wr(stream);
-            m_info_header.width = m_pixbuf.get_width();
-            m_info_header.height = m_pixbuf.get_height();
-            m_info_header.bit_depth = traits::get_bit_depth();
-            m_info_header.color = traits::get_color_type();
-            wr.set_header(m_info_header);
-            wr.write_info();
-            wr.write_image(m_pixbuf);
-            wr.write_end_info();
+            pixel_generator pixgen(m_info, m_pixbuf);
+            pixgen.write(stream);
         }
 
-        //////////////////////////////////////////////////////////////////////
-        // buffer accessors
-        //
-        pixbuf& get_pixbuf(void)
+        /**
+         * \brief Returns a reference to image pixel buffer.
+         */
+        pixbuf& get_pixbuf()
         {
             return m_pixbuf;
         }
         
-        pixbuf const& get_pixbuf(void) const
+        /**
+         * \brief Returns a const reference to image pixel buffer.
+         */
+        pixbuf const& get_pixbuf() const
         {
             return m_pixbuf;
         }
 
+        /**
+         * \brief Replaces the image pixel buffer.
+         *
+         * \param buffer  a pixel buffer object to take a copy from
+         */
         void set_pixbuf(pixbuf const& buffer)
         {
             m_pixbuf = buffer;
         }
 
-        size_t get_width(void) const
+        size_t get_width() const
         {
             return m_pixbuf.get_width();
         }
 
-        size_t get_height(void) const
+        size_t get_height() const
         {
             return m_pixbuf.get_height();
         }
 
+        /**
+         * \brief Resizes the image pixel buffer.
+         */
         void resize(size_t width, size_t height)
         {
             m_pixbuf.resize(width, height);
+            m_info.set_width(width);
+            m_info.set_height(height);
         }
 
-        row& get_row(int index)
+        /**
+         * \brief Returns a reference to the row of image data at
+         * specified index.
+         *
+         * \see pixel_buffer::get_row()
+         */
+        row_type& get_row(size_t index)
         {
             return m_pixbuf.get_row(index);
         }
         
-        row const& get_row(int index) const
+        /**
+         * \brief Returns a const reference to the row of image data at
+         * specified index.
+         *
+         * \see pixel_buffer::get_row()
+         */
+        row_type const& get_row(size_t index) const
         {
             return m_pixbuf.get_row(index);
         }
 
-        pixel get_pixel(int x, int y) const
+        /**
+         * \brief The non-checking version of get_row() method.
+         */
+        row_type& operator[](size_t index)
+        {
+            return m_pixbuf[index];
+        }
+        
+        /**
+         * \brief The non-checking version of get_row() method.
+         */
+        row_type const& operator[](size_t index) const
+        {
+            return m_pixbuf[index];
+        }
+
+        /**
+         * \brief Returns a pixel at (x,y) position.
+         */
+        pixel get_pixel(size_t x, size_t y) const
         {
             return m_pixbuf.get_pixel(x, y);
         }
 
-        void set_pixel(int x, int y, pixel p)
+        /**
+         * \brief Replaces a pixel at (x,y) position.
+         */
+        void set_pixel(size_t x, size_t y, pixel p)
         {
             m_pixbuf.set_pixel(x, y, p);
         }
 
-    protected:
-        pixbuf m_pixbuf;
+        interlace_type get_interlace_type() const
+        {
+            return m_info.get_interlace_type();
+        }
 
-    private:
-        info::header m_info_header;
+        void set_interlace_type(interlace_type interlace)
+        {
+            m_info.set_interlace_type(interlace);
+        }
+
+        compression_type get_compression_type() const
+        {
+            return m_info.get_compression_type();
+        }
+
+        void set_compression_type(compression_type compression)
+        {
+            m_info.set_compression_type(compression);
+        }
+
+        filter_type get_filter_type() const
+        {
+            return m_info.get_filter_type();
+        }
+
+        void set_filter_type(filter_type filter)
+        {
+            m_info.set_filter_type(filter);
+        }
+
+        /**
+         * \brief Returns a reference to the image palette.
+         */
+        palette& get_palette()
+        {
+            return m_info.get_palette();
+        }
+
+        /**
+         * \brief Returns a const reference to the image palette.
+         */
+        palette const& get_palette() const
+        {
+            return m_info.get_palette();
+        }
+
+        /**
+         * \brief Replaces the image palette.
+         */
+        void set_palette(palette const& plte)
+        {
+            m_info.set_palette(plte);
+        }
+
+    protected:
+        /**
+         * \brief A common base class tempate for pixel_consumer and
+         * pixel_generator classes.
+         */
+        template< typename base >
+        class streaming_impl
+            : public base
+        {
+        public:
+            streaming_impl(image_info& info, pixbuf& pixels)
+                : base(info),
+                  m_pixbuf(pixels)
+            {
+            }
+
+            /**
+             * \brief Returns the starting address of a \c pos-th row
+             * in the image's pixel buffer.
+             */
+            byte* get_next_row(size_t pos)
+            {
+                typedef typename pixbuf::row_traits row_traits;
+                return reinterpret_cast< byte* >
+                    (row_traits::get_data(m_pixbuf.get_row(pos)));
+            }
+
+        protected:
+            pixbuf& m_pixbuf;
+        };
+
+        /**
+         * \brief The pixel buffer adapter for reading pixel data.
+         */
+        class pixel_consumer
+            : public streaming_impl< consumer< pixel, pixel_consumer,
+                                               image_info_ref_holder,
+                                               /* interlacing = */ true > >
+        {
+        public:
+            pixel_consumer(image_info& info, pixbuf& pixels)
+                : streaming_impl< consumer< pixel, pixel_consumer,
+                                            image_info_ref_holder,
+                                            true > >(info, pixels)
+            {
+            }
+
+            void reset(size_t pass)
+            {
+                if (pass == 0)
+                {
+                    this->m_pixbuf.resize(this->get_info().get_width(),
+                                          this->get_info().get_height());
+                }
+            }
+        };
+
+        /**
+         * \brief The pixel buffer adapter for writing pixel data.
+         */
+        class pixel_generator
+            : public streaming_impl< generator< pixel, pixel_generator,
+                                                image_info_ref_holder,
+                                                /* interlacing = */ true > >
+        {
+        public:
+            pixel_generator(image_info& info, pixbuf& pixels)
+                : streaming_impl< generator< pixel, pixel_generator,
+                                             image_info_ref_holder,
+                                             true > >(info, pixels)
+            {
+            }
+        };
+
+        image_info m_info;
+        pixbuf m_pixbuf;
     };
 
 } // namespace png

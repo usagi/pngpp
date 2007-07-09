@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2007   Alex Shulgin
  *
  * This file is part of png++ the C++ wrapper for libpng.  Png++ is free
@@ -31,156 +31,296 @@
 #ifndef PNGPP_CONVERT_COLOR_SPACE_HPP_INCLUDED
 #define PNGPP_CONVERT_COLOR_SPACE_HPP_INCLUDED
 
-#include "io_transform.hpp"
+#include "error.hpp"
 #include "rgb_pixel.hpp"
 #include "rgba_pixel.hpp"
+#include "gray_pixel.hpp"
+#include "ga_pixel.hpp"
+#include "index_pixel.hpp"
+#include "reader.hpp"
+#include "writer.hpp"
 
 namespace png
 {
 
-    template< typename pixel >
-    class convert_color_space
-        : public io_transform
+    namespace
     {
-    public:
-        inline void operator()(io_base& io) const;
-    };
 
-    // convert_color_space class template specializations
-    // for various pixel types
-
-    template<>
-    class convert_color_space< rgb_pixel >
-        : public io_transform
-    {
-    public:
-        void operator()(io_base& io) const
+        /**
+         * \brief IO transformation class template.  Converts %image %color
+         * space.
+         */
+        template< typename pixel >
+        struct convert_color_space_impl
         {
-            if (io.get_bit_depth() == 16)
+            typedef pixel_traits< pixel > traits;
+            typedef typename traits::component_type component_type;
+            typedef basic_alpha_pixel_traits< component_type > alpha_traits;
+
+            void operator()(reader& io) const
             {
-#ifdef PNG_READ_16_TO_8_SUPPORTED
-                io.set_strip_16();
-#else
-                throw error("convert_color_space: expected 8-bit data"
-                            " but found 16-bit;"
-                            " recompile with PNG_READ_16_TO_8_SUPPORTED");
-#endif
+                handle_16(io);
+                handle_alpha(io, alpha_traits::get_alpha_filler());
+                handle_palette(io);
+                handle_rgb(io);
+                handle_gray(io);
+
+                io.set_color_type(traits::get_color_type());
+                io.set_bit_depth(traits::get_bit_depth());
             }
-            if (io.get_color_type() & color_mask_alpha)
+
+            void operator()(writer& io) const;
+
+        protected:
+            static void expand_8_to_16(png_struct*, png_row_info* row_info,
+                                       byte* row)
             {
+//            dump_row(row, row_info->rowbytes);
+
+                for (size_t i = row_info->rowbytes; i-- > 0; )
+                {
+                    // use PNG byte order (big-endian)
+                    row[i*2 + 0] = row[i];
+                    row[i*2 + 1] = 0;
+                }
+
+//            dump_row(row, row_info->rowbytes);
+            }
+
+            static void dump_row(byte const* row, size_t width)
+            {
+                printf("{");
+                for (size_t i = 0; i < width; ++i)
+                {
+                    printf(" %02x,", row[i]);
+                }
+                printf(" }\n");
+            }
+
+            static void handle_16(reader& io)
+            {
+                if (io.get_bit_depth() == 16 && traits::get_bit_depth() == 8)
+                {
+#ifdef PNG_READ_16_TO_8_SUPPORTED
+                    io.set_strip_16();
+#else
+                    throw error("expected 8-bit data but found 16-bit;"
+                                " recompile with PNG_READ_16_TO_8_SUPPORTED");
+#endif
+                }
+                if (io.get_bit_depth() != 16 && traits::get_bit_depth() == 16)
+                {
+#ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
+                    io.set_read_user_transform(expand_8_to_16);
+                    io.set_user_transform_info(NULL, 16,
+                                               traits::get_channels());
+#else
+                    throw error("expected 16-bit data but found 8-bit;"
+                                " recompile with"
+                                " PNG_READ_USER_TRANSFORM_SUPPORTED");
+#endif
+                }
+            }
+
+            static void handle_alpha(reader& io, uint_32 filler)
+            {
+                bool src_alpha = io.get_color_type() & color_mask_alpha;
+                bool dst_alpha = traits::get_color_type() & color_mask_alpha;
+                if (src_alpha && !dst_alpha)
+                {
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
-                io.set_strip_alpha();
+                    io.set_strip_alpha();
 #else
-                throw error("convert_color_space: alpha channel unexpected;"
-                            " recompile with PNG_READ_STRIP_ALPHA_SUPPORTED");
-#endif
-            }
-            if (io.get_color_type() == color_type_palette)
-            {
-#ifdef PNG_READ_EXPAND_SUPPORTED
-                io.set_palette_to_rgb();
-#else
-                throw error("convert_color_space: expected RGB data"
-                            " but found indexed colors;"
-                            " recompile with PNG_READ_EXPAND_SUPPORTED");
-#endif
-            }
-            else if (io.get_color_type() == color_type_gray
-                     || io.get_color_type() == color_type_gray_alpha)
-            {
-                if (io.get_color_type() == color_type_gray
-                    && io.get_bit_depth() < 8)
-                {
-#ifdef PNG_READ_EXPAND_SUPPORTED
-                    io.set_gray_1_2_4_to_8();
-#else
-                    throw error("convert_color_space: expected RGB data"
-                                " but found grayscale (< 8-bit) colors;"
-                                " recompile with PNG_READ_EXPAND_SUPPORTED");
+                    throw error("alpha channel unexpected;"
+                                " recompile with"
+                                " PNG_READ_STRIP_ALPHA_SUPPORTED");
 #endif
                 }
-#ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
-                io.set_gray_to_rgb();
-#else
-                throw error("convert_color_space: expected RGB data"
-                            " but found grayscale colors;"
-                            " recompile with PNG_READ_GRAY_TO_RGB_SUPPORTED");
+                if (!src_alpha && dst_alpha)
+                {
+#if defined(PNG_tRNS_SUPPORTED) && defined(PNG_READ_EXPAND_SUPPORTED)
+                    if ((io.get_color_type() & color_mask_palette)
+                        && io.has_chunk(chunk_tRNS))
+                    {
+                        io.set_tRNS_to_alpha();
+                        return;
+                    }
 #endif
-            }
-        }
-    };
-
-    template<>
-    class convert_color_space< rgba_pixel >
-        : public io_transform
-    {
-    public:
-        explicit convert_color_space(uint_32 filler = 0xff)
-            : m_filler(filler)
-        {
-        }
-
-        void operator()(io_base& io) const
-        {
-            if (io.get_bit_depth() == 16)
-            {
-#ifdef PNG_READ_16_TO_8_SUPPORTED
-                io.set_strip_16();
-#else
-                throw error("convert_color_space: expected 8-bit data"
-                            " but found 16-bit;"
-                            " recompile with PNG_READ_16_TO_8_SUPPORTED");
-#endif
-            }
-            if (!(io.get_color_type() & color_mask_alpha))
-            {
 #if defined(PNG_READ_FILLER_SUPPORTED) && !defined(PNG_1_0_X)
-                io.set_add_alpha(m_filler, filler_after);
+                    io.set_add_alpha(filler, filler_after);
 #else
-                throw error("convert_color_space: expected alpha channel"
-                            " but none found;"
-                            " recompile with PNG_READ_FILLER_SUPPORTED"
-                            " and be sure to use libpng > 1.0.x");
+                    throw error("expected alpha channel but none found;"
+                                " recompile with PNG_READ_FILLER_SUPPORTED"
+                                " and be sure to use libpng > 1.0.x");
 #endif
+                }
             }
-            if (io.get_color_type() == color_type_palette)
+
+            static void handle_palette(reader& io)
             {
-#ifdef PNG_READ_EXPAND_SUPPORTED
-                io.set_palette_to_rgb();
-#else
-                throw error("convert_color_space: expected RGB data"
-                            " but found indexed colors;"
-                            " recompile with PNG_READ_EXPAND_SUPPORTED");
-#endif
-            }
-            else if (io.get_color_type() == color_type_gray
-                    || io.get_color_type() == color_type_gray_alpha)
-            {
-                if (io.get_color_type() == color_type_gray
-                    && io.get_bit_depth() < 8)
+                if (io.get_color_type() == color_type_palette)
                 {
 #ifdef PNG_READ_EXPAND_SUPPORTED
-                    io.set_gray_1_2_4_to_8();
+                    io.set_palette_to_rgb();
+
+                    if (traits::get_color_type() != color_type_palette)
+                    {
+                        io.get_info().drop_palette();
+                    }
 #else
-                    throw error("convert_color_space: expected RGBA data"
-                                " but found grayscale (< 8-bit) colors;"
+                    throw error("indexed colors unexpected;"
                                 " recompile with PNG_READ_EXPAND_SUPPORTED");
 #endif
                 }
-#ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
-                io.set_gray_to_rgb();
-#else
-                throw error("convert_color_space: expected RGBA data"
-                            " but found grayscale colors;"
-                            " recompile with PNG_READ_GRAY_TO_RGB_SUPPORTED");
-#endif
             }
-        }
 
-    private:
-        uint_32 m_filler;
+            static void handle_rgb(reader& io)
+            {
+                bool src_rgb =
+                    io.get_color_type() & (color_mask_rgb | color_mask_palette);
+                bool dst_rgb = traits::get_color_type() & color_mask_rgb;
+                if (src_rgb && !dst_rgb)
+                {
+#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
+                    io.set_rgb_to_gray();
+#else
+                    throw error("grayscale data expected;"
+                                " recompile with"
+                                " PNG_READ_RGB_TO_GRAY_SUPPORTED");
+#endif
+                }
+                if (!src_rgb && dst_rgb)
+                {
+#ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
+                    io.set_gray_to_rgb();
+#else
+                    throw error("expected RGB data;"
+                                " recompile with"
+                                " PNG_READ_GRAY_TO_RGB_SUPPORTED");
+#endif
+                }
+            }
+
+            static void handle_gray(reader& io)
+            {
+                if ((io.get_color_type() & ~color_mask_alpha)
+                    == color_type_gray)
+                {
+                    if (io.get_bit_depth() < 8 && traits::get_bit_depth() >= 8)
+                    {
+#ifdef PNG_READ_EXPAND_SUPPORTED
+                        io.set_gray_1_2_4_to_8();
+#else
+                        throw error("convert_color_space: expected 8-bit data;"
+                                    " recompile with"
+                                    " PNG_READ_EXPAND_SUPPORTED");
+#endif
+                    }
+                }
+            }
+        };
+
+    } // unnamed namespace
+
+    /**
+     * \brief IO transformation class template.  Converts %image %color
+     * space.
+     *
+     * This IO transformation class template is used to convert %color
+     * space of the source %image to the %color space of the target
+     * %image.  An error with human-readable description is thrown
+     * when the %color space could not be converted.  Often, this
+     * means that you have to recompile libpng with some more
+     * conversion options turned on.
+     *
+     * Not implemented -- see specializations.
+     *
+     * \see image, image::read
+     */
+    template< typename pixel >
+    struct convert_color_space
+    {
     };
 
+    /**
+     * \brief Converts %image %color space.  A specialization for
+     * rgb_pixel type.
+     */
+    template<>
+    struct convert_color_space< rgb_pixel >
+        : convert_color_space_impl< rgb_pixel >
+    {
+    };
+
+    /**
+     * \brief Converts %image %color space.  A specialization for
+     * rgb_pixel_16 type.
+     */
+    template<>
+    struct convert_color_space< rgb_pixel_16 >
+        : convert_color_space_impl< rgb_pixel_16 >
+    {
+    };
+
+    /**
+     * \brief Converts %image %color space.  A specialization for
+     * rgba_pixel type.
+     */
+    template<>
+    struct convert_color_space< rgba_pixel >
+        : convert_color_space_impl< rgba_pixel >
+    {
+    };
+
+    /**
+     * \brief Converts %image %color space.  A specialization for
+     * rgba_pixel_16 type.
+     */
+    template<>
+    struct convert_color_space< rgba_pixel_16 >
+        : convert_color_space_impl< rgba_pixel_16 >
+    {
+    };
+
+    /**
+     * \brief Converts %image %color space.  A specialization for
+     * gray_pixel type.
+     */
+    template<>
+    struct convert_color_space< gray_pixel >
+        : convert_color_space_impl< gray_pixel >
+    {
+    };
+
+    /**
+     * \brief Converts %image %color space.  A specialization for
+     * gray_pixel_16 type.
+     */
+    template<>
+    struct convert_color_space< gray_pixel_16 >
+        : convert_color_space_impl< gray_pixel_16 >
+    {
+    };
+
+    /**
+     * \brief Converts %image %color space.  A specialization for
+     * ga_pixel type.
+     */
+    template<>
+    struct convert_color_space< ga_pixel >
+        : convert_color_space_impl< ga_pixel >
+    {
+    };
+
+    /**
+     * \brief Converts %image %color space.  A specialization for
+     * ga_pixel_16 type.
+     */
+    template<>
+    struct convert_color_space< ga_pixel_16 >
+        : convert_color_space_impl< ga_pixel_16 >
+    {
+    };
 
 } // namespace png
 
