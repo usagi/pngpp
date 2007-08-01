@@ -407,7 +407,7 @@ namespace png
 
     protected:
         /**
-         * \brief A common base class tempate for pixel_consumer and
+         * \brief A common base class template for pixel_consumer and
          * pixel_generator classes.
          */
         template< typename base >
