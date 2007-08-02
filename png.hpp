@@ -37,6 +37,7 @@
 #include "error.hpp"
 #include "color.hpp"
 #include "palette.hpp"
+#include "tRNS.hpp"
 #include "packed_pixel.hpp"
 #include "rgb_pixel.hpp"
 #include "rgba_pixel.hpp"

@@ -35,7 +35,7 @@
 
 template< typename pixel >
 void
-generate_image(png::image< pixel >& image, char const* filename)
+generate_image(png::image< pixel >& image)
 {
     typedef png::pixel_traits< pixel > traits;
     size_t colors = 1 << traits::get_bit_depth();
@@ -57,7 +57,6 @@ generate_image(png::image< pixel >& image, char const* filename)
             image.set_pixel(i, j, i + j);
         }
     }
-    image.write(filename);
 }
 
 int
@@ -65,16 +64,30 @@ main()
 try
 {
     png::image< png::index_pixel_1 > image1;
-    generate_image(image1, "palette1.png.out");
+    generate_image(image1);
+    image1.write("palette1.png.out");
 
     png::image< png::index_pixel_2 > image2;
-    generate_image(image2, "palette2.png.out");
+    generate_image(image2);
+    image2.write("palette2.png.out");
 
     png::image< png::index_pixel_4 > image4;
-    generate_image(image4, "palette4.png.out");
+    generate_image(image4);
+    image4.write("palette4.png.out");
 
     png::image< png::index_pixel > image8;
-    generate_image(image8, "palette8.png.out");
+    generate_image(image8);
+    image8.write("palette8.png.out");
+
+    png::image< png::index_pixel > image8_tRNS;
+    generate_image(image8_tRNS);
+    png::tRNS trns(256);
+    for (size_t i = 0; i < trns.size(); ++i)
+    {
+        trns[i] = i;
+    }
+    image8_tRNS.set_tRNS(trns);
+    image8_tRNS.write("palette8_tRNS.png.out");
 }
 catch (std::exception const& error)
 {

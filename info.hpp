@@ -75,6 +75,22 @@ namespace png
                 png_get_PLTE(m_png, m_info, & colors, & count);
                 m_palette.assign(colors, colors + count);
             }
+#ifdef PNG_tRNS_SUPPORTED
+            if (png_get_valid(m_png, m_info, chunk_tRNS) == chunk_tRNS)
+            {
+                if (m_color_type == color_type_palette)
+                {
+                    int count;
+                    byte* values;
+                    if (png_get_tRNS(m_png, m_info, & values, & count, NULL)
+                        != PNG_INFO_tRNS)
+                    {
+                        throw error("png_get_tRNS() failed");
+                    }
+                    m_tRNS.assign(values, values + count);
+                }
+            }
+#endif
         }
 
         void write() const
@@ -83,11 +99,26 @@ namespace png
             assert(m_info);
 
             sync_ihdr();
-            if (! m_palette.empty())
+            if (m_color_type == color_type_palette)
             {
-                png_set_PLTE(m_png, m_info,
-                             const_cast< color* >(& m_palette[0]),
-                             m_palette.size());
+                if (! m_palette.empty())
+                {
+                    png_set_PLTE(m_png, m_info,
+                                 const_cast< color* >(& m_palette[0]),
+                                 m_palette.size());
+                }
+                if (! m_tRNS.empty())
+                {
+#ifdef PNG_tRNS_SUPPORTED
+                    png_set_tRNS(m_png, m_info,
+                                 const_cast< byte* >(& m_tRNS[0]),
+                                 m_tRNS.size(),
+                                 NULL);
+#else
+                    throw error("attempted to write tRNS chunk;"
+                                " recompile with PNG_tRNS_SUPPORTED");
+#endif
+                }
             }
             png_write_info(m_png, m_info);
         }

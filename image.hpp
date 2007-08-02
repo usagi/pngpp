@@ -405,6 +405,21 @@ namespace png
             m_info.set_palette(plte);
         }
 
+        tRNS const& get_tRNS() const
+        {
+            return m_info.get_tRNS();
+        }
+
+        tRNS& get_tRNS()
+        {
+            return m_info.get_tRNS();
+        }
+
+        void set_tRNS(tRNS const& trns)
+        {
+            m_info.set_tRNS(trns);
+        }
+
     protected:
         /**
          * \brief A common base class template for pixel_consumer and

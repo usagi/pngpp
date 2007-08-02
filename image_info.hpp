@@ -33,6 +33,7 @@
 
 #include "types.hpp"
 #include "palette.hpp"
+#include "tRNS.hpp"
 #include "pixel_traits.hpp"
 
 namespace png
@@ -155,6 +156,21 @@ namespace png
             m_palette.clear();
         }
 
+        tRNS const& get_tRNS() const
+        {
+            return m_tRNS;
+        }
+
+        tRNS& get_tRNS()
+        {
+            return m_tRNS;
+        }
+
+        void set_tRNS(tRNS const& trns)
+        {
+            m_tRNS = trns;
+        }
+
     protected:
         uint_32 m_width;
         uint_32 m_height;
@@ -164,6 +180,7 @@ namespace png
         compression_type m_compression_type;
         filter_type m_filter_type;
         palette m_palette;
+        tRNS m_tRNS;
     };
 
     /**

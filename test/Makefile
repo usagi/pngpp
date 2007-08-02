@@ -108,6 +108,7 @@ test-generate_palette:
 		out=palette$$i.png.out; \
 		cmp $$out cmp/$$out; \
 	done
+	cmp palette8_tRNS.png.out cmp/palette8_tRNS.png.out
 
 clean-tests-output:
 	rm -f *.out
