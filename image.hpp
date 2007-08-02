@@ -410,13 +410,13 @@ namespace png
          * \brief A common base class template for pixel_consumer and
          * pixel_generator classes.
          */
-        template< typename base >
+        template< typename base_impl >
         class streaming_impl
-            : public base
+            : public base_impl
         {
         public:
             streaming_impl(image_info& info, pixbuf& pixels)
-                : base(info),
+                : base_impl(info),
                   m_pixbuf(pixels)
             {
             }
