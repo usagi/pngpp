@@ -161,6 +161,8 @@
  * In png++ you can create new images like this:
  *
  * \code
+ * #include <png++/png.hpp>
+ * //...
  * png::image< png::rgb_pixel > image(128, 128);
  * for (size_t y = 0; y < image.get_height(); ++y)
  * {
@@ -183,6 +185,8 @@
  * palette (colormap).  One of the ways to do this is the following:
  *
  * \code
+ * #include <png++/png.hpp>
+ * //...
  * png::image< png::index_pixel > image;
  * png::palette pal(256);
  * for (size_t i = 0; i < pal.size(); ++i)
@@ -218,6 +222,30 @@
  * and the following to link it:
  *
  * \verbatim $ g++ -o example example.o `libpng-config --ldflags --libs` \endverbatim
+ *
+ * When compiling you should add \c -I \c $PREFIX/include if you have
+ * installed png++ to non-standard location, like your home directory.
+ *
+ * In your program, the line
+ *
+ * \code
+ * #include <png++/png.hpp>
+ * \endcode
+ *
+ * brings in all the header files in png++ which should be suitable
+ * for the most of the applications.  You may include only the headers
+ * you really use, for example:
+ *
+ * \code
+ * #include <png++/image.hpp>
+ * #include <png++/rgb_pixel.hpp>
+ * \endcode
+ *
+ * If do not want to install png++ headers you still can compile your
+ * programs.  Just create a subdirectory named \c png++ somewhere in
+ * your project tree and copy all of the \c .hpp files in png++
+ * distribution there.  Then use appropriate compiler options to add
+ * this directory into the header search path.
  *
  * \section sec_further Further reading
  *
