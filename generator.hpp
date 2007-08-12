@@ -33,6 +33,8 @@
 
 #include <cassert>
 #include <stdexcept>
+#include <iostream>
+#include <ostream>
 #include "error.hpp"
 #include "streaming_base.hpp"
 #include "writer.hpp"
@@ -107,6 +109,7 @@ namespace png
      */
     template< typename pixel,
               class pixgen,
+              class ostream = std::ostream,
               class info_holder = def_image_info_holder,
               bool interlacing_supported = false >
     class generator
@@ -121,9 +124,9 @@ namespace png
          * writing interlaced images as long as your generator class
          * supports this.
          */
-        void write(std::ostream& stream)
+        void write(ostream& stream)
         {
-            writer wr(stream);
+            writer< ostream > wr(stream);
             wr.set_image_info(this->get_info());
             wr.write_info();
 

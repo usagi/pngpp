@@ -57,6 +57,7 @@ namespace png
             typedef typename traits::component_type component_type;
             typedef basic_alpha_pixel_traits< component_type > alpha_traits;
 
+            template< class reader >
             void operator()(reader& io) const
             {
                 handle_16(io);
@@ -68,8 +69,6 @@ namespace png
                 io.set_color_type(traits::get_color_type());
                 io.set_bit_depth(traits::get_bit_depth());
             }
-
-            void operator()(writer& io) const;
 
         protected:
             static void expand_8_to_16(png_struct*, png_row_info* row_info,
@@ -97,6 +96,7 @@ namespace png
                 printf(" }\n");
             }
 
+            template< class reader >
             static void handle_16(reader& io)
             {
                 if (io.get_bit_depth() == 16 && traits::get_bit_depth() == 8)
@@ -122,6 +122,7 @@ namespace png
                 }
             }
 
+            template< class reader >
             static void handle_alpha(reader& io, uint_32 filler)
             {
                 bool src_alpha = io.get_color_type() & color_mask_alpha;
@@ -156,6 +157,7 @@ namespace png
                 }
             }
 
+            template< class reader >
             static void handle_palette(reader& io)
             {
                 if (io.get_color_type() == color_type_palette)
@@ -174,6 +176,7 @@ namespace png
                 }
             }
 
+            template< class reader >
             static void handle_rgb(reader& io)
             {
                 bool src_rgb =
@@ -201,6 +204,7 @@ namespace png
                 }
             }
 
+            template< class reader >
             static void handle_gray(reader& io)
             {
                 if ((io.get_color_type() & ~color_mask_alpha)

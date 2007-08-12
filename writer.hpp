@@ -32,7 +32,6 @@
 #define PNGPP_WRITER_HPP_INCLUDED
 
 #include <cassert>
-#include <iostream>
 #include "io_base.hpp"
 
 namespace png
@@ -45,6 +44,7 @@ namespace png
      *
      * \see image, reader, generator, io_base
      */
+    template< class ostream >
     class writer
         : public io_base
     {
@@ -53,7 +53,7 @@ namespace png
          * \brief Constructs a writer prepared to write PNG image into
          * a \a stream.
          */
-        explicit writer(std::ostream& stream)
+        explicit writer(ostream& stream)
             : io_base(png_create_write_struct(PNG_LIBPNG_VER_STRING,
                                               static_cast< io_base* >(this),
                                               raise_error,
@@ -122,14 +122,13 @@ namespace png
             io_base* io = static_cast< io_base* >(png_get_error_ptr(png));
             writer* wr = static_cast< writer* >(io);
             wr->reset_error();
-            std::ostream* stream
-                = reinterpret_cast< std::ostream* >(png_get_io_ptr(png));
+            ostream* stream = reinterpret_cast< ostream* >(png_get_io_ptr(png));
             try
             {
                 stream->write(reinterpret_cast< char* >(data), length);
                 if (!stream->good())
                 {
-                    wr->set_error("std::istream::write() failed");
+                    wr->set_error("ostream::write() failed");
                 }
             }
             catch (std::exception const& error)
@@ -152,14 +151,13 @@ namespace png
             io_base* io = static_cast< io_base* >(png_get_error_ptr(png));
             writer* wr = static_cast< writer* >(io);
             wr->reset_error();
-            std::ostream* stream
-                = reinterpret_cast< std::ostream* >(png_get_io_ptr(png));
+            ostream* stream = reinterpret_cast< ostream* >(png_get_io_ptr(png));
             try
             {
                 stream->flush();
                 if (!stream->good())
                 {
-                    wr->set_error("std::istream::flush() failed");
+                    wr->set_error("ostream::flush() failed");
                 }
             }
             catch (std::exception const& error)

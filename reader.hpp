@@ -32,7 +32,6 @@
 #define PNGPP_READER_HPP_INCLUDED
 
 #include <cassert>
-#include <iostream>
 #include "io_base.hpp"
 
 namespace png
@@ -45,6 +44,7 @@ namespace png
      *
      * \see image, consumer, writer, io_base
      */
+    template< class istream >
     class reader
         : public io_base
     {
@@ -53,7 +53,7 @@ namespace png
          * \brief Constructs a reader prepared to read PNG image from
          * a \a stream.
          */
-        explicit reader(std::istream& stream)
+        explicit reader(istream& stream)
             : io_base(png_create_read_struct(PNG_LIBPNG_VER_STRING,
                                              static_cast< io_base* >(this),
                                              raise_error,
@@ -132,14 +132,13 @@ namespace png
             io_base* io = static_cast< io_base* >(png_get_error_ptr(png));
             reader* rd = static_cast< reader* >(io);
             rd->reset_error();
-            std::istream* stream
-                = reinterpret_cast< std::istream* >(png_get_io_ptr(png));
+            istream* stream = reinterpret_cast< istream* >(png_get_io_ptr(png));
             try
             {
                 stream->read(reinterpret_cast< char* >(data), length);
                 if (!stream->good())
                 {
-                    rd->set_error("std::istream::read() failed");
+                    rd->set_error("istream::read() failed");
                 }
             }
             catch (std::exception const& error)

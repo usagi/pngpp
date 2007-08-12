@@ -33,6 +33,8 @@
 
 #include <cassert>
 #include <stdexcept>
+#include <iostream>
+#include <istream>
 #include "error.hpp"
 #include "streaming_base.hpp"
 #include "reader.hpp"
@@ -116,6 +118,7 @@ namespace png
      */
     template< typename pixel,
               class pixcon,
+              class istream = std::istream,
               class info_holder = def_image_info_holder,
               bool interlacing_supported = false >
     class consumer
@@ -136,7 +139,7 @@ namespace png
          * \brief Reads an image from the stream using default io
          * transformation.
          */
-        void read(std::istream& stream)
+        void read(istream& stream)
         {
             read(stream, transform_identity());
         }
@@ -150,9 +153,9 @@ namespace png
          * IO transformation as well as interlaced image reading.
          */
         template< class transformation >
-        void read(std::istream& stream, transformation const& transform)
+        void read(istream& stream, transformation const& transform)
         {
-            reader rd(stream);
+            reader< istream > rd(stream);
             rd.read_info();
             transform(rd);
 
@@ -206,7 +209,7 @@ namespace png
         }
 
     private:
-        void skip_interlaced_rows(reader& rd, size_t pass_count)
+        void skip_interlaced_rows(reader< istream >& rd, size_t pass_count)
         {
             typedef std::vector< pixel > row;
             typedef row_traits< row > row_traits_type;
@@ -218,7 +221,8 @@ namespace png
             }
         }
 
-        void read_rows(reader& rd, size_t pass_count, pixcon* pixel_con)
+        void read_rows(reader< istream >& rd, size_t pass_count,
+                       pixcon* pixel_con)
         {
             for (size_t pass = 0; pass < pass_count; ++pass)
             {
