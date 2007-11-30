@@ -13,4 +13,5 @@
 + add compilation dependency detection
 + add pixel_buffer/image::operator[]
 + improve docs and README
-+ endianness in expand_8_to_16()
+? endianness in expand_8_to_16()
+- unify error messages (capitalization, etc.)

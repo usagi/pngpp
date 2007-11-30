@@ -74,16 +74,15 @@ namespace png
             static void expand_8_to_16(png_struct*, png_row_info* row_info,
                                        byte* row)
             {
-//            dump_row(row, row_info->rowbytes);
+//                dump_row(row, row_info->rowbytes);
 
                 for (size_t i = row_info->rowbytes; i-- > 0; )
                 {
-                    // use PNG byte order (big-endian)
-                    row[i*2 + 0] = row[i];
-                    row[i*2 + 1] = 0;
+                    row[i*2 + 1] = row[i];
+                    row[i*2 + 0] = 0;
                 }
 
-//            dump_row(row, row_info->rowbytes);
+//                dump_row(row, 2*row_info->rowbytes);
             }
 
             static void dump_row(byte const* row, size_t width)
@@ -118,6 +117,17 @@ namespace png
                     throw error("expected 16-bit data but found 8-bit;"
                                 " recompile with"
                                 " PNG_READ_USER_TRANSFORM_SUPPORTED");
+#endif
+                }
+                if (traits::get_bit_depth() == 16)
+                {
+#if 1 // test endianness
+#ifdef PNG_READ_SWAP_SUPPORTED
+                    io.set_swap();
+#else
+                    throw error("cannot convert to 16-bit image --"
+                                " recompile with PNG_READ_SWAP_SUPPORTED.");
+#endif
 #endif
                 }
             }

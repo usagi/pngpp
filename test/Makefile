@@ -51,7 +51,9 @@ endif
 sources := convert_color_space.cpp \
   generate_gray_packed.cpp \
   read_write_gray_packed.cpp \
-  generate_palette.cpp
+  generate_palette.cpp \
+  write_gray_16.cpp \
+  dump.cpp
 
 deps := $(sources:.cpp=.dep)
 objects := $(sources:.cpp=.o)
@@ -81,6 +83,7 @@ test-convert_color_space:
 		for j in RGB RGBA GRAY GA; do \
 			for k in 8 16; do \
 				out=$$i.$$j.$$k.out; \
+				echo ./convert_color_space $$j $$k $$i $$out; \
 				./convert_color_space $$j $$k $$i $$out \
 				&& cmp $$out cmp/$$out; \
 			done; \
@@ -98,6 +101,7 @@ test-read_write_gray_packed:
 	for i in 1 2 4; do \
 		in=basn0g0$$i.png; \
 		out=$$in.out; \
+		echo ./read_write_gray_packed $$i $$in $$out; \
 		./read_write_gray_packed $$i $$in $$out \
 		&& cmp $$out cmp/$$out; \
 	done

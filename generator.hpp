@@ -130,6 +130,18 @@ namespace png
             wr.set_image_info(this->get_info());
             wr.write_info();
 
+#if 1 // test endianness
+            if (pixel_traits< pixel >::get_bit_depth() == 16)
+            {
+#ifdef PNG_WRITE_SWAP_SUPPORTED
+                wr.set_swap();
+#else
+                throw error("Cannot write 16-bit image --"
+                            " recompile with PNG_WRITE_SWAP_SUPPORTED.");
+#endif
+            }
+#endif
+
             size_t pass_count;
             if (this->get_info().get_interlace_type() != interlace_none)
             {
