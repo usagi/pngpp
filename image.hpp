@@ -141,21 +141,21 @@ namespace png
          * \brief Constructs an image reading data from a stream using
          * default converting transform.
          */
-        template< class istream >
-        explicit image(istream& stream)
-        {
-            read(stream, transform_convert());
-        }
+//         template< class istream >
+//         explicit image(istream& stream)
+//         {
+//             read(stream, transform_convert());
+//         }
 
         /**
          * \brief Constructs an image reading data from a stream using
          * custom transformation.
          */
-        template< class istream, class transformation >
-        image(istream& stream, transformation const& transform)
-        {
-            read(stream, transform);
-        }
+//         template< class istream, class transformation >
+//         image(istream& stream, transformation const& transform)
+//         {
+//             read(stream, transform);
+//         }
 
         /**
          * \brief Reads an image from specified file using default
@@ -198,7 +198,7 @@ namespace png
                 throw std_error(filename);
             }
             stream.exceptions(std::ios::badbit);
-            read(stream, transform);
+            read_stream(stream, transform);
         }
 
         /**
@@ -206,9 +206,9 @@ namespace png
          * converting transform.
          */
         template< class istream >
-        void read(istream& stream)
+        void read_stream(istream& stream)
         {
-            read(stream, transform_convert());
+            read_stream(stream, transform_convert());
         }
 
         /**
@@ -216,7 +216,7 @@ namespace png
          * transformation.
          */
         template< class istream, class transformation >
-        void read(istream& stream, transformation const& transform)
+        void read_stream(istream& stream, transformation const& transform)
         {
             pixel_consumer< istream > pixcon(m_info, m_pixbuf);
             pixcon.read(stream, transform);
@@ -241,14 +241,14 @@ namespace png
                 throw std_error(filename);
             }
             stream.exceptions(std::ios::badbit);
-            write(stream);
+            write_stream(stream);
         }
 
         /**
          * \brief Writes an image to a stream.
          */
         template< class ostream >
-        void write(ostream& stream)
+        void write_stream(ostream& stream)
         {
             pixel_generator< ostream > pixgen(m_info, m_pixbuf);
             pixgen.write(stream);

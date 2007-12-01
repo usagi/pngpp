@@ -53,6 +53,7 @@ sources := convert_color_space.cpp \
   read_write_gray_packed.cpp \
   generate_palette.cpp \
   write_gray_16.cpp \
+  read_write_param.cpp \
   dump.cpp
 
 deps := $(sources:.cpp=.dep)
