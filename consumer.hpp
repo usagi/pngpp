@@ -35,6 +35,9 @@
 #include <stdexcept>
 #include <iostream>
 #include <istream>
+
+#include <endian.h>
+
 #include "error.hpp"
 #include "streaming_base.hpp"
 #include "reader.hpp"
@@ -158,6 +161,18 @@ namespace png
             reader< istream > rd(stream);
             rd.read_info();
             transform(rd);
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+            if (pixel_traits< pixel >::get_bit_depth() == 16)
+            {
+#ifdef PNG_READ_SWAP_SUPPORTED
+                rd.set_swap();
+#else
+                throw error("Cannot read 16-bit image --"
+                            " recompile with PNG_READ_SWAP_SUPPORTED.");
+#endif
+            }
+#endif
 
             // interlace handling _must_ be set up prior to info update
             size_t pass_count;

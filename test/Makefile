@@ -76,7 +76,8 @@ test: all \
   test-convert_color_space \
   test-generate_gray_packed \
   test-read_write_gray_packed \
-  test-generate_palette
+  test-generate_palette \
+  test-write_gray_16
 
 test-convert_color_space:
 	for i in *.png; do \
@@ -113,6 +114,9 @@ test-generate_palette:
 		cmp $$out cmp/$$out; \
 	done
 	cmp palette8_tRNS.png.out cmp/palette8_tRNS.png.out
+
+test-write_gray_16:
+	./write_gray_16 && cmp gray_16.out cmp/gray_16.out
 
 clean-tests-output:
 	rm -f *.out

@@ -35,6 +35,9 @@
 #include <stdexcept>
 #include <iostream>
 #include <ostream>
+
+#include <endian.h>
+
 #include "error.hpp"
 #include "streaming_base.hpp"
 #include "writer.hpp"
@@ -130,7 +133,7 @@ namespace png
             wr.set_image_info(this->get_info());
             wr.write_info();
 
-#if 1 // test endianness
+#if __BYTE_ORDER == __LITTLE_ENDIAN
             if (pixel_traits< pixel >::get_bit_depth() == 16)
             {
 #ifdef PNG_WRITE_SWAP_SUPPORTED

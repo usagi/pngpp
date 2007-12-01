@@ -119,17 +119,6 @@ namespace png
                                 " PNG_READ_USER_TRANSFORM_SUPPORTED");
 #endif
                 }
-                if (traits::get_bit_depth() == 16)
-                {
-#if 1 // test endianness
-#ifdef PNG_READ_SWAP_SUPPORTED
-                    io.set_swap();
-#else
-                    throw error("cannot convert to 16-bit image --"
-                                " recompile with PNG_READ_SWAP_SUPPORTED.");
-#endif
-#endif
-                }
             }
 
             template< class reader >
