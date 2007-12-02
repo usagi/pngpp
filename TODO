@@ -17,4 +17,4 @@
 - unify error messages (capitalization, etc.)
 - move stream template parameter from class to function level in
   generator and consumer
-- make all tests run even if any of them fails
++ make all tests run even if any of them fails
