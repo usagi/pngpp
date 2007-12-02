@@ -36,14 +36,14 @@
 namespace png
 {
 
-    namespace
+    namespace detail
     {
         template< size_t bits > class allowed_bit_depth;
 
         template<> class allowed_bit_depth< 1 > {};
         template<> class allowed_bit_depth< 2 > {};
         template<> class allowed_bit_depth< 4 > {};
-    }
+    } // namespace detail
 
     /**
      * \brief The packed pixel class template.
@@ -52,7 +52,7 @@ namespace png
      */
     template< size_t bits >
     class packed_pixel
-        : allowed_bit_depth< bits >
+        : detail::allowed_bit_depth< bits >
     {
     public:
         packed_pixel(byte value = 0)

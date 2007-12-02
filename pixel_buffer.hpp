@@ -222,7 +222,7 @@ namespace png
         }
     };
 
-    namespace
+    namespace detail
     {
 
         template< class pixel, typename reference >
@@ -319,7 +319,7 @@ namespace png
             }
         };
 
-    } // unnamed namespace
+    } // namespace detail
 
     /**
      * \brief The packed pixel row class template.
@@ -357,12 +357,12 @@ namespace png
         /**
          * \brief The immutable packed pixel proxy type.
          */
-        typedef const_packed_pixel_proxy< pixel > const_pixel_proxy;
+        typedef detail::const_packed_pixel_proxy< pixel > const_pixel_proxy;
 
         /**
          * \brief The mutable packed pixel proxy type.
          */
-        typedef packed_pixel_proxy< pixel > pixel_proxy;
+        typedef detail::packed_pixel_proxy< pixel > pixel_proxy;
 
         /**
          * \brief Returns an immutable proxy the to the pixel at \c
@@ -459,7 +459,8 @@ namespace png
         }
 
         pixel_buffer(size_t width, size_t height)
-            : basic_pixel_buffer< pixel_type, pixel_row_type >(width, height)
+            : basic_pixel_buffer< pixel_type,
+                                  pixel_row_type >(width, height)
         {
         }
     };
@@ -483,7 +484,8 @@ namespace png
         }
 
         pixel_buffer(size_t width, size_t height)
-            : basic_pixel_buffer< pixel_type, pixel_row_type >(width, height)
+            : basic_pixel_buffer< pixel_type,
+                                  pixel_row_type >(width, height)
         {
         }
     };
