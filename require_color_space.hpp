@@ -42,7 +42,7 @@
 namespace png
 {
 
-    namespace
+    namespace detail
     {
 
         template< typename pixel >
@@ -96,7 +96,7 @@ namespace png
         template<> char const* wrong_color_space< index_pixel_4 >::error_msg =
             "1-bit Colormap color space required";
 
-    } // unnamed namespace
+    } // namespace detail
 
     /**
      * \brief IO transformation class template.  Enforces image color space.
@@ -116,7 +116,7 @@ namespace png
             if (io.get_color_type() != traits::get_color_type()
                 || io.get_bit_depth() != traits::get_bit_depth())
             {
-                throw error(wrong_color_space< pixel >::error_msg);
+                throw error(detail::wrong_color_space< pixel >::error_msg);
             }
         }
     };

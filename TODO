@@ -15,3 +15,6 @@
 + improve docs and README
 ? endianness in expand_8_to_16()
 - unify error messages (capitalization, etc.)
+- move stream template parameter from class to function level in
+  generator and consumer
+- make all tests run even if any of them fails

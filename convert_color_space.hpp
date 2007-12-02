@@ -43,7 +43,7 @@
 namespace png
 {
 
-    namespace
+    namespace detail
     {
 
         /**
@@ -223,7 +223,7 @@ namespace png
             }
         };
 
-    } // unnamed namespace
+    } // namespace detal
 
     /**
      * \brief IO transformation class template.  Converts %image %color
@@ -251,7 +251,7 @@ namespace png
      */
     template<>
     struct convert_color_space< rgb_pixel >
-        : convert_color_space_impl< rgb_pixel >
+        : detail::convert_color_space_impl< rgb_pixel >
     {
     };
 
@@ -261,7 +261,7 @@ namespace png
      */
     template<>
     struct convert_color_space< rgb_pixel_16 >
-        : convert_color_space_impl< rgb_pixel_16 >
+        : detail::convert_color_space_impl< rgb_pixel_16 >
     {
     };
 
@@ -271,7 +271,7 @@ namespace png
      */
     template<>
     struct convert_color_space< rgba_pixel >
-        : convert_color_space_impl< rgba_pixel >
+        : detail::convert_color_space_impl< rgba_pixel >
     {
     };
 
@@ -281,7 +281,7 @@ namespace png
      */
     template<>
     struct convert_color_space< rgba_pixel_16 >
-        : convert_color_space_impl< rgba_pixel_16 >
+        : detail::convert_color_space_impl< rgba_pixel_16 >
     {
     };
 
@@ -291,7 +291,7 @@ namespace png
      */
     template<>
     struct convert_color_space< gray_pixel >
-        : convert_color_space_impl< gray_pixel >
+        : detail::convert_color_space_impl< gray_pixel >
     {
     };
 
@@ -301,7 +301,7 @@ namespace png
      */
     template<>
     struct convert_color_space< gray_pixel_16 >
-        : convert_color_space_impl< gray_pixel_16 >
+        : detail::convert_color_space_impl< gray_pixel_16 >
     {
     };
 
@@ -311,7 +311,7 @@ namespace png
      */
     template<>
     struct convert_color_space< ga_pixel >
-        : convert_color_space_impl< ga_pixel >
+        : detail::convert_color_space_impl< ga_pixel >
     {
     };
 
@@ -321,7 +321,7 @@ namespace png
      */
     template<>
     struct convert_color_space< ga_pixel_16 >
-        : convert_color_space_impl< ga_pixel_16 >
+        : detail::convert_color_space_impl< ga_pixel_16 >
     {
     };
 
