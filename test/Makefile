@@ -64,7 +64,7 @@ all: $(deps) $(targets)
 
 dist-copy-files:
 	mkdir $(dist_dir)/test
-	cp $(sources) Makefile README *.png $(dist_dir)/test
+	cp $(sources) Makefile test.sh README *.png $(dist_dir)/test
 	mkdir $(dist_dir)/test/cmp
 	cp cmp/*.out $(dist_dir)/test/cmp
 
@@ -86,7 +86,7 @@ clean-tests-output:
   clean-deps
 
 %$(bin_suffix): %.o
-	g++ -o $@ $< $(make_ldflags) `$(LIBPNG_CONFIG) --ldflags --libs`
+	g++ -o $@ $< $(make_ldflags) `$(LIBPNG_CONFIG) --ldflags`
 
 %.o: %.cpp
 	g++ -c -o $@ $< $(make_cflags) `$(LIBPNG_CONFIG) --cflags`

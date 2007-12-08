@@ -38,9 +38,27 @@ namespace png
 {
 
     /**
-     * \brief PNG writer class.  This is the low-level writing
+     * \brief PNG writer class template.  This is the low-level writing
      * interface -- use image class or generator class to actually
      * write images.
+     *
+     * The \c ostream template parameter specifies the type of output
+     * stream to work with.  The \c ostream class should implement the
+     * minimum of the following interface:
+     *
+     * \code
+     * class my_ostream
+     * {
+     * public:
+     *     void write(char const*, size_t);
+     *     void flush();
+     *     bool good();
+     * };
+     * \endcode
+     *
+     * With the semantics similar to the \c std::ostream.  Naturally,
+     * \c std::ostream fits this requirement and can be used with the
+     * writer class as is.
      *
      * \see image, reader, generator, io_base
      */

@@ -66,7 +66,7 @@ clean: clean-deps
 .PHONY: all dist-copy-files clean clean-deps
 
 %$(bin_suffix): %.o
-	g++ -o $@ $< $(make_ldflags) `$(LIBPNG_CONFIG) --ldflags --libs`
+	g++ -o $@ $< $(make_ldflags) `$(LIBPNG_CONFIG) --ldflags`
 
 %.o: %.cpp
 	g++ -c -o $@ $< $(make_cflags) `$(LIBPNG_CONFIG) --cflags`

@@ -54,7 +54,7 @@ namespace png
      * pixel buffer.
      *
      * Encapsulates PNG %image reading procedure.  In order to create
-     * custom pixel %consumer, use CRTP trick:
+     * a custom pixel %consumer use CRTP trick:
      *
      * \code
      * class pixel_consumer
@@ -121,7 +121,6 @@ namespace png
      */
     template< typename pixel,
               class pixcon,
-              class istream = std::istream,
               class info_holder = def_image_info_holder,
               bool interlacing_supported = false >
     class consumer
@@ -142,6 +141,7 @@ namespace png
          * \brief Reads an image from the stream using default io
          * transformation.
          */
+        template< typename istream >
         void read(istream& stream)
         {
             read(stream, transform_identity());
@@ -153,9 +153,9 @@ namespace png
          *
          * Essentially, this method constructs a reader object and
          * instructs it to read the image from the stream.  It handles
-         * IO transformation as well as interlaced image reading.
+         * IO transformation, as well as interlaced image reading.
          */
-        template< class transformation >
+        template< typename istream, class transformation >
         void read(istream& stream, transformation const& transform)
         {
             reader< istream > rd(stream);
@@ -224,6 +224,7 @@ namespace png
         }
 
     private:
+        template< typename istream >
         void skip_interlaced_rows(reader< istream >& rd, size_t pass_count)
         {
             typedef std::vector< pixel > row;
@@ -236,6 +237,7 @@ namespace png
             }
         }
 
+        template< typename istream >
         void read_rows(reader< istream >& rd, size_t pass_count,
                        pixcon* pixel_con)
         {

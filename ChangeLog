@@ -1,3 +1,8 @@
+png++-0.2.1	08 Dec 2007
+
+	Added support for tRNS chunk.  Added non-std IO streams support.
+	Fixed 16-bit endianness problems.  Improved test script.
+
 png++-0.2.0	08 Jul 2007
 
 	Major internal code refactoring.  Added support for non-8-bit

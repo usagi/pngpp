@@ -55,7 +55,7 @@ namespace png
      * A usage example can be found in \c example/pixel_generator.cpp.
      *
      * Encapsulates PNG %image writing procedure.  In order to create
-     * custom pixel %generator, use CRTP trick:
+     * a custom pixel %generator use CRTP trick:
      *
      * \code
      * class pixel_generator
@@ -101,7 +101,7 @@ namespace png
      * specifies whether writing interlacing images is supported by
      * your %generator class.  It defaults to \c false.  An attempt to
      * write an interlaced %image will result in throwing
-     * std::logic_error.
+     * \c std::logic_error.
      *
      * In order to fully support interlacing specify \c true for \c
      * interlacing_supported parameter and implement \c reset()
@@ -112,7 +112,6 @@ namespace png
      */
     template< typename pixel,
               class pixgen,
-              class ostream = std::ostream,
               class info_holder = def_image_info_holder,
               bool interlacing_supported = false >
     class generator
@@ -127,6 +126,7 @@ namespace png
          * writing interlaced images as long as your generator class
          * supports this.
          */
+        template< typename ostream >
         void write(ostream& stream)
         {
             writer< ostream > wr(stream);

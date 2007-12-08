@@ -38,9 +38,26 @@ namespace png
 {
 
     /**
-     * \brief The PNG reader class.  This is the low-level reading
-     * interface -- use image class or consumer class to actually read
-     * images.
+     * \brief The PNG reader class template.  This is the low-level
+     * reading interface -- use image class or consumer class to
+     * actually read images.
+     *
+     * The \c istream template parameter specifies the type of input
+     * stream to work with.  The \c istream class should implement the
+     * minimum of the following interface:
+     *
+     * \code
+     * class my_istream
+     * {
+     * public:
+     *     void read(char*, size_t);
+     *     bool good();
+     * };
+     * \endcode
+     *
+     * With the semantics similar to the \c std::istream.  Naturally,
+     * \c std::istream fits this requirement and can be used with the
+     * reader class as is.
      *
      * \see image, consumer, writer, io_base
      */

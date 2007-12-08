@@ -63,7 +63,7 @@
  * \section sec_intro Introduction
  *
  * This is the documentation for png++ the C++ wrapper for libpng.
- * This page documents png++ version 0.2.
+ * This page documents png++ version 0.2.1.
  *
  * Png++ aims to provide simple yet powerful C++ interface to libpng,
  * the PNG reference implementation library.  Png++ is free software
@@ -72,17 +72,10 @@
  *
  * \section sec_news News
  *
- * - Added support for 16-bit data (RGB, RGBA, Grayscale and
- *   Gray+Alpha color types)
- * - Added support for packed 1-, 2- or 4-bit pixels (Grayscale and
- *   Indexed colors)
- * - Fixed interlace handling code which was severely broken
- * - Added possibility to process images without reading the entire
- *   image into memory
- * - Internals are refactored while the client interface is mostly
- *   unchanged
- * - Added intensive test suite
- * - Added documentation
+ * - Added support for tRNS chunk.
+ * - Added non-std IO streams support.
+ * - Fixed 16-bit endianness problems.
+ * - Improved test script.
  *
  * \section sec_getting_started Getting started
  *
@@ -116,19 +109,19 @@
  * \section sec_installing Installing
  *
  * Png++ comes as a set of header files and does not require
- * compilation be installed.  For the same reason there are no binary
- * packages for png++.
+ * compilation to be installed.  For the same reason there are no
+ * binary packages for png++.
  *
  * \subsection subs_prerequisites Prerequisites
  *
  * - png++ works with libpng-1.2.x.
- * - png++ compiles with g++-4.1.  Other version should work well too,
- *   but I have not tested.
+ * - png++ compiles with g++-4.1 and g++-4.2.  Other version should
+ *   work well too.
  * - png++ relies on GNU make for compiling tests and examples; in
  *   particular it uses "remaking makefiles" feature
  * - Documentation is produced using <a
- *   href="http://www.doxygen.org/">doxygen</a>.  This one is compiled
- *   with doxygen-1.5.2.
+ *   href="http://www.doxygen.org/">doxygen</a>.  See the bottom of
+ *   this page for doxygen version used to compile these docs.
  *
  * \subsection subs_installing_pngpp Installing png++
  *
@@ -221,7 +214,7 @@
  *
  * and the following to link it:
  *
- * \verbatim $ g++ -o example example.o `libpng-config --ldflags --libs` \endverbatim
+ * \verbatim $ g++ -o example example.o `libpng-config --ldflags` \endverbatim
  *
  * When compiling you should add \c -I \c $PREFIX/include if you have
  * installed png++ to non-standard location, like your home directory.
@@ -279,7 +272,7 @@
  *
  * - Lacks support for output transformations
  * - Lacks support for optional/unknown chunks in PNG data stream
- * - Documentation sucks
+ * - Documentation sucks <tt>;-)</tt>
  *
  * To report bugs, please use Savannah bug tracker:
  * http://savannah.nongnu.org/bugs/?group=pngpp&func=additem

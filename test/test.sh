@@ -38,5 +38,5 @@ cmp palette8_tRNS.png.out cmp/palette8_tRNS.png.out || status=1
 echo ./write_gray_16
 ./write_gray_16 && cmp gray_16.out cmp/gray_16.out || status=1
 
-test $status -eq 0 || echo 'PNG++ FAILS TESTS'
+test $status -eq 0 && echo 'PNG++ PASSES TESTS' || echo 'PNG++ FAILS TESTS'
 exit $status

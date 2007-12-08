@@ -184,7 +184,7 @@ namespace png
                 if (src_rgb && !dst_rgb)
                 {
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
-                    io.set_rgb_to_gray();
+                    io.set_rgb_to_gray(/*rgb_to_gray_error*/);
 #else
                     throw error("grayscale data expected;"
                                 " recompile with"

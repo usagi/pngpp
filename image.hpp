@@ -141,21 +141,20 @@ namespace png
          * \brief Constructs an image reading data from a stream using
          * default converting transform.
          */
-//         template< class istream >
-//         explicit image(istream& stream)
-//         {
-//             read(stream, transform_convert());
-//         }
+        explicit image(std::istream& stream)
+        {
+            read_stream(stream, transform_convert());
+        }
 
         /**
          * \brief Constructs an image reading data from a stream using
          * custom transformation.
          */
-//         template< class istream, class transformation >
-//         image(istream& stream, transformation const& transform)
-//         {
-//             read(stream, transform);
-//         }
+        template< class transformation >
+        image(std::istream& stream, transformation const& transform)
+        {
+            read_stream(stream, transform);
+        }
 
         /**
          * \brief Reads an image from specified file using default
@@ -205,6 +204,25 @@ namespace png
          * \brief Reads an image from a stream using default
          * converting transform.
          */
+        void read(std::istream& stream)
+        {
+            read_stream(stream, transform_convert());
+        }
+
+        /**
+         * \brief Reads an image from a stream using custom
+         * transformation.
+         */
+        template< class transformation >
+        void read(std::istream& stream, transformation const& transform)
+        {
+            read_stream(stream, transform);
+        }
+
+        /**
+         * \brief Reads an image from a stream using default
+         * converting transform.
+         */
         template< class istream >
         void read_stream(istream& stream)
         {
@@ -218,7 +236,7 @@ namespace png
         template< class istream, class transformation >
         void read_stream(istream& stream, transformation const& transform)
         {
-            pixel_consumer< istream > pixcon(m_info, m_pixbuf);
+            pixel_consumer pixcon(m_info, m_pixbuf);
             pixcon.read(stream, transform);
         }
 
@@ -247,10 +265,18 @@ namespace png
         /**
          * \brief Writes an image to a stream.
          */
+        void write_stream(std::ostream& stream)
+        {
+            write_stream(stream);
+        }
+
+        /**
+         * \brief Writes an image to a stream.
+         */
         template< class ostream >
         void write_stream(ostream& stream)
         {
-            pixel_generator< ostream > pixgen(m_info, m_pixbuf);
+            pixel_generator pixgen(m_info, m_pixbuf);
             pixgen.write(stream);
         }
 
@@ -457,19 +483,16 @@ namespace png
         /**
          * \brief The pixel buffer adapter for reading pixel data.
          */
-        template< class istream >
         class pixel_consumer
             : public streaming_impl< consumer< pixel,
-                                               pixel_consumer< istream >,
-                                               istream,
+                                               pixel_consumer,
                                                image_info_ref_holder,
                                                /* interlacing = */ true > >
         {
         public:
             pixel_consumer(image_info& info, pixbuf& pixels)
                 : streaming_impl< consumer< pixel,
-                                            pixel_consumer< istream >,
-                                            istream,
+                                            pixel_consumer,
                                             image_info_ref_holder,
                                             true > >(info, pixels)
             {
@@ -488,19 +511,16 @@ namespace png
         /**
          * \brief The pixel buffer adapter for writing pixel data.
          */
-        template< class ostream >
         class pixel_generator
             : public streaming_impl< generator< pixel,
-                                                pixel_generator< ostream >,
-                                                ostream,
+                                                pixel_generator,
                                                 image_info_ref_holder,
                                                 /* interlacing = */ true > >
         {
         public:
             pixel_generator(image_info& info, pixbuf& pixels)
                 : streaming_impl< generator< pixel,
-                                             pixel_generator< ostream >,
-                                             ostream,
+                                             pixel_generator,
                                              image_info_ref_holder,
                                              true > >(info, pixels)
             {

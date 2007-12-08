@@ -1,19 +1,29 @@
-Version 0.2:
+Version 0.2.1:
 
-- Added support for 16-bit data (RGB, RGBA, Grayscale and Gray+Alpha
-  color types)
+  - Added support for tRNS chunk.
 
-- Added support for packed 1-, 2- or 4-bit pixels (Grayscale and
-  Indexed colors)
+  - Added non-std IO streams support.
 
-- Fixed interlace handling code which was severely broken
+  - Fixed 16-bit endianness problems.
 
-- Added possibility to process images without reading the entire image
-  into memory
+  - Improved test script.
 
-- Internals are refactored while the client interface is mostly
-  unchanged
+Version 0.2.0:
 
-- Added intensive test suite
+  - Added support for 16-bit data (RGB, RGBA, Grayscale and Gray+Alpha
+    color types)
 
-- Added documentation
+  - Added support for packed 1-, 2- or 4-bit pixels (Grayscale and
+    Indexed colors)
+
+  - Fixed interlace handling code which was severely broken
+
+  - Added possibility to process images without reading the entire
+    image into memory
+
+  - Internals are refactored while the client interface is mostly
+    unchanged
+
+  - Added intensive test suite
+
+  - Added documentation
