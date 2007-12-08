@@ -264,7 +264,7 @@
  * http://svn.sv.nongnu.org/pngpp/trunk/ (for people w/o outgoing svn).
  *
  * Online version of this documentation can be found here:
- * http://www.nongnu.org/pngpp/doc/html/index.html
+ * http://www.nongnu.org/pngpp/doc/0.2.1/index.html
  *
  * \section sec_bugs Bugs
  *
