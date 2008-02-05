@@ -36,8 +36,7 @@
 #include <iostream>
 #include <istream>
 
-#include <endian.h>
-
+#include "config.hpp"
 #include "error.hpp"
 #include "streaming_base.hpp"
 #include "reader.hpp"

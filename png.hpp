@@ -33,6 +33,7 @@
 
 #include <png.h>
 
+#include "config.hpp"
 #include "types.hpp"
 #include "error.hpp"
 #include "color.hpp"
