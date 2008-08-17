@@ -401,7 +401,7 @@ namespace png
         {
             io_base* io = static_cast< io_base* >(png_get_error_ptr(png));
             io->set_error(message);
-            longjmp(png->jmpbuf, -1);
+            io->raise_error();
         }
 
         png_struct* m_png;

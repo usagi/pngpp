@@ -127,7 +127,7 @@ namespace png
         }
 
         /**
-         * \brief Reads endinig info about PNG image.
+         * \brief Reads ending info about PNG image.
          */
         void read_end_info()
         {

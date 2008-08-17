@@ -68,13 +68,13 @@ namespace png
         /**
          * Constructs an std_error object.  The \a message string is
          * appended with <tt>": "</tt> and the error description as
-         * returned by \c std::strerror(\a error).
+         * returned by \c strerror(\a error).
          *
          * \param  message  error description
          * \param  error    error number
          */
         explicit std_error(std::string const& message, int error = errno)
-            : std::runtime_error(message + ": " + std::strerror(error))
+            : std::runtime_error((message + ": ") + strerror(error))
         {
         }
     };

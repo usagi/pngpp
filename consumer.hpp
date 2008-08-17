@@ -89,7 +89,7 @@ namespace png
      * any calls to \c get_next_row().  The value of \c 0 is passed
      * for the \c pass number.
      *
-     * An optional template parameter \c info_holder encapsulated
+     * An optional template parameter \c info_holder encapsulates
      * image_info storage policy.  Using def_image_info_holder results
      * in image_info object stored as a sub-object of the consumer
      * class.  You may specify image_info_ref_holder in order to use a

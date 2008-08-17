@@ -311,8 +311,8 @@ namespace png
 
             packed_pixel_proxy& operator=(pixel p)
             {
-                this->m_ref = this->m_ref
-                    & ~(pixel::get_bit_mask() << this->m_shift)
+                this->m_ref = (this->m_ref
+                    & ~(pixel::get_bit_mask() << this->m_shift))
                     | (p << this->m_shift);
 
                 return *this;
