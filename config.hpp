@@ -42,6 +42,11 @@
 #define	__BIG_ENDIAN	4321
 #define __BYTE_ORDER __LITTLE_ENDIAN
 
+#elif defined(__APPLE__)
+
+#include <machine/endian.h>
+#include <sys/_endian.h>
+
 #else
 
 #error Byte-order could not be detected.
