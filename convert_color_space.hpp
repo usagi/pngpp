@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2007   Alex Shulgin
+ * Copyright (C) 2007,2008   Alex Shulgin
  *
- * This file is part of png++ the C++ wrapper for libpng.  Png++ is free
+ * This file is part of png++ the C++ wrapper for libpng.  PNG++ is free
  * software; the exact copying conditions are as follows:
  *
  * Redistribution and use in source and binary forms, with or without
@@ -236,7 +236,7 @@ namespace png
      * means that you have to recompile libpng with some more
      * conversion options turned on.
      *
-     * Not implemented -- see specializations.
+     * Not implemented--see specializations.
      *
      * \see image, image::read
      */

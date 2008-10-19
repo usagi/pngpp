@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2007   Alex Shulgin
+ * Copyright (C) 2007,2008   Alex Shulgin
  *
- * This file is part of png++ the C++ wrapper for libpng.  Png++ is free
+ * This file is part of png++ the C++ wrapper for libpng.  PNG++ is free
  * software; the exact copying conditions are as follows:
  *
  * Redistribution and use in source and binary forms, with or without
@@ -66,8 +66,8 @@
  * This is the documentation for png++ the C++ wrapper for libpng.
  * This page documents png++ version 0.2.1.
  *
- * Png++ aims to provide simple yet powerful C++ interface to libpng,
- * the PNG reference implementation library.  Png++ is free software
+ * PNG++ aims to provide simple yet powerful C++ interface to libpng,
+ * the PNG reference implementation library.  PNG++ is free software
  * distributed under a modified variant of BSD <a
  * href="http://www.nongnu.org/pngpp/license.html">license</a>.
  *
@@ -109,7 +109,7 @@
  *
  * \section sec_installing Installing
  *
- * Png++ comes as a set of header files and does not require
+ * PNG++ comes as a set of header files and does not require
  * compilation to be installed.  For the same reason there are no
  * binary packages for png++.
  *

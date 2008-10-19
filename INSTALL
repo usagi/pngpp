@@ -1,21 +1,22 @@
 General
 =======
 
-Png++ comes as a set of header files and does not require compilation
-be installed.  For the same reason there are no binary packages for
+PNG++ comes as a set of header files and does not require compilation
+to be installed.  For the same reason there are no binary packages for
 png++.
 
 
 Prerequisites
 =============
 
-- png++ works with libpng-1.2.x.
+- png++ is known to work with libpng-1.2.x (probably, the 1.4.x
+  flavour will work too)
 
 - png++ compiles with g++-4.1.  Other version should work well too,
   but I have not tested.
 
 - png++ relies on GNU make for compiling tests and examples; in
-  particular it uses "remaking makefiles" feature
+  particular it uses "remaking makefiles" feature.
 
 - Documentation is produced using doxygen (http://www.doxygen.org/).
 
@@ -59,14 +60,17 @@ OK.
 
 to run doxygen in the sources directory.
 
-- Now it is time to become root and install png++ into your system.
+- Now it is time to become root and install png++ into your system:
+
+	# make install
+
 It's OK to issue "make install" under ordinary user permissions if you
 want to install png++ into your home directory.  Run the following
 command:
 
 	$ make install PREFIX=$HOME
 
-to copy png++ header files to ~/include/png++ and documentation
+This will copy png++ header files to ~/include/png++ and documentation
 files to ~/share/doc/png++-0.2.x (if the docs were built).
 
 Without a PREFIX png++ installs to /usr/local
@@ -74,4 +78,4 @@ Without a PREFIX png++ installs to /usr/local
 
 Happy hacking!
 --
-Alex Shulgin  <alex.shulgin.gmail.com>
+Alex Shulgin  <alex.shulgin@gmail.com>

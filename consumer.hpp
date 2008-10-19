@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2007   Alex Shulgin
+ * Copyright (C) 2007,2008   Alex Shulgin
  *
- * This file is part of png++ the C++ wrapper for libpng.  Png++ is free
+ * This file is part of png++ the C++ wrapper for libpng.  PNG++ is free
  * software; the exact copying conditions are as follows:
  *
  * Redistribution and use in source and binary forms, with or without
@@ -167,7 +167,7 @@ namespace png
 #ifdef PNG_READ_SWAP_SUPPORTED
                 rd.set_swap();
 #else
-                throw error("Cannot read 16-bit image --"
+                throw error("Cannot read 16-bit image:"
                             " recompile with PNG_READ_SWAP_SUPPORTED.");
 #endif
             }
@@ -180,7 +180,7 @@ namespace png
 #ifdef PNG_READ_INTERLACING_SUPPORTED
                 pass_count = rd.set_interlace_handling();
 #else
-                throw error("Cannot read interlaced image --"
+                throw error("Cannot read interlaced image:"
                             " interlace handling disabled.");
 #endif
             }

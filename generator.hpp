@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2007   Alex Shulgin
+ * Copyright (C) 2007,2008   Alex Shulgin
  *
- * This file is part of png++ the C++ wrapper for libpng.  Png++ is free
+ * This file is part of png++ the C++ wrapper for libpng.  PNG++ is free
  * software; the exact copying conditions are as follows:
  *
  * Redistribution and use in source and binary forms, with or without
@@ -138,7 +138,7 @@ namespace png
 #ifdef PNG_WRITE_SWAP_SUPPORTED
                 wr.set_swap();
 #else
-                throw error("Cannot write 16-bit image --"
+                throw error("Cannot write 16-bit image:"
                             " recompile with PNG_WRITE_SWAP_SUPPORTED.");
 #endif
             }
@@ -154,11 +154,11 @@ namespace png
                 }
                 else
                 {
-                    throw std::logic_error("Cannot write interlaced image --"
+                    throw std::logic_error("Cannot write interlaced image:"
                                            " generator does not support it.");
                 }
 #else
-                throw error("Cannot write interlaced image --"
+                throw error("Cannot write interlaced image:"
                             " interlace handling disabled.");
 #endif
             }
