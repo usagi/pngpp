@@ -28,7 +28,9 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-version := 0.2.1
+
+# don't forget to update version before releasing!
+version := 0.2.3
 
 ifndef PREFIX
 PREFIX := /usr/local

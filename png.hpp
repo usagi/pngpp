@@ -64,7 +64,7 @@
  * \section sec_intro Introduction
  *
  * This is the documentation for png++ the C++ wrapper for libpng.
- * This page documents png++ version 0.2.1.
+ * This page documents png++ version 0.2.
  *
  * PNG++ aims to provide simple yet powerful C++ interface to libpng,
  * the PNG reference implementation library.  PNG++ is free software
@@ -265,7 +265,7 @@
  * http://svn.sv.nongnu.org/pngpp/trunk/ (for people w/o outgoing svn).
  *
  * Online version of this documentation can be found here:
- * http://www.nongnu.org/pngpp/doc/0.2.1/index.html
+ * http://www.nongnu.org/pngpp/doc/0.2.3/index.html
  *
  * \section sec_bugs Bugs
  *

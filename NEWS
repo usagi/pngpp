@@ -1,3 +1,15 @@
+Version 0.2.3:
+
+  - Fixed numerous `already defined' errors due to require_color_space
+    implementation.
+
+  - Added `config.hpp'.
+
+  - Fixed `strerror' usage.
+
+  - Minor docs fixes.
+
+
 Version 0.2.1:
 
   - Added support for tRNS chunk.
@@ -7,6 +19,7 @@ Version 0.2.1:
   - Fixed 16-bit endianness problems.
 
   - Improved test script.
+
 
 Version 0.2.0:
 
