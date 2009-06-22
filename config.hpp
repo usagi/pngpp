@@ -47,6 +47,11 @@
 #include <machine/endian.h>
 #include <sys/_endian.h>
 
+#elif defined(__FreeBSD__)
+
+#include <machine/endian.h>
+#include <sys/endian.h>
+
 #else
 
 #error Byte-order could not be detected.
