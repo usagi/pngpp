@@ -67,9 +67,14 @@ all: examples
 
 install: install-headers install-docs
 
+uninstall: uninstall-headers uninstall-docs
+
 install-headers:
 	mkdir -p $(PREFIX)/include/png++
 	cp *.hpp $(PREFIX)/include/png++
+
+uninstall-headers:
+	rm -rf $(PREFIX)/include/png++
 
 dist: dist-mkdir dist-copy-files dist-package
 
@@ -125,6 +130,9 @@ install-docs:
 		[ -L png++ ] && rm png++; \
 		[ -d png++ ] || ln -s $(dist_dir) png++; \
 	fi
+
+uninstall-docs:
+	rm -rf $(PREFIX)/share/doc/$(dist_dir) $(PREFIX)/share/doc/png++
 
 examples:
 	$(MAKE) -C example $(MAKEFLAGS)
