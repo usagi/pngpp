@@ -185,7 +185,11 @@ namespace png
 #if defined(PNG_READ_EXPAND_SUPPORTED)
         void set_gray_1_2_4_to_8() const
         {
+#if PNG_LIBPNG_VER >= 10400
+            png_set_expand_gray_1_2_4_to_8(m_png);
+#else
             png_set_gray_1_2_4_to_8(m_png);
+#endif
         }
 
         void set_palette_to_rgb() const
