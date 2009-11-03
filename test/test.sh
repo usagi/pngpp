@@ -1,42 +1,58 @@
 #!/bin/sh
 
-status=0
+tests=0
+fails=0
+
+echo -n >test.log
+
+run() {
+    tests=$(( $tests + 1 ))
+    if sh -c "( $1 ) >>test.log 2>&1"; then
+        echo -n '.'
+    else
+        fails=$(( $fails + 1 ))
+        echo -n 'F'
+    fi
+}
 
 for i in *.png; do
     for j in RGB RGBA GRAY GA; do
 	for k in 8 16; do
 	    out=$i.$j.$k.out
-	    echo ./convert_color_space $j $k $i $out
-	    ./convert_color_space $j $k $i $out && cmp $out cmp/$out \
-	    || status=1
+	    run "./convert_color_space $j $k $i $out && cmp $out cmp/$out"
 	done;
     done;
 done
 
-echo ./generate_gray_packed
-./generate_gray_packed || status=1
+run ./generate_gray_packed
 for i in 1 2 4; do
     out=gray_packed_$i.png.out
-    cmp $out cmp/$out || status=1
+    run "cmp $out cmp/$out"
 done
 
 for i in 1 2 4; do
     in=basn0g0$i.png
     out=$in.out
-    echo ./read_write_gray_packed $i $in $out
-    ./read_write_gray_packed $i $in $out && cmp $out cmp/$out || status=1
+    run "./read_write_gray_packed $i $in $out && cmp $out cmp/$out"
 done
 
-echo ./generate_palette
-./generate_palette || status=1
+run ./generate_palette
 for i in 1 2 4 8; do
     out=palette$i.png.out
-    cmp $out cmp/$out || status=1
+    run "cmp $out cmp/$out"
 done
-cmp palette8_tRNS.png.out cmp/palette8_tRNS.png.out || status=1
+run "cmp palette8_tRNS.png.out cmp/palette8_tRNS.png.out"
 
-echo ./write_gray_16
-./write_gray_16 && cmp gray_16.out cmp/gray_16.out || status=1
+run "./write_gray_16 && cmp gray_16.out cmp/gray_16.out"
 
-test $status -eq 0 && echo 'PNG++ PASSES TESTS' || echo 'PNG++ FAILS TESTS'
-exit $status
+echo "\n=================="
+
+if [ $fails -eq 0 ]; then
+    echo "PNG++ passes tests ($tests passed)"
+    test -s test.log && echo "warning: test.log is not empty\n"
+    exit 0
+else
+    echo "PNG++ FAILS TESTS ($fails OF $tests FAILED)"
+    echo "review test.log for clues\n"
+    exit 1
+fi
