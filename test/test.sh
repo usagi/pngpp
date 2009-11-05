@@ -15,25 +15,28 @@ run() {
     fi
 }
 
+cd pngsuite
 for i in *.png; do
     for j in RGB RGBA GRAY GA; do
 	for k in 8 16; do
 	    out=$i.$j.$k.out
-	    run "./convert_color_space $j $k $i $out && cmp $out cmp/$out"
+	    run "../convert_color_space $j $k $i $out && cmp $out ../cmp/$out"
 	done;
     done;
-done
-
-run ./generate_gray_packed
-for i in 1 2 4; do
-    out=gray_packed_$i.png.out
-    run "cmp $out cmp/$out"
 done
 
 for i in 1 2 4; do
     in=basn0g0$i.png
     out=$in.out
-    run "./read_write_gray_packed $i $in $out && cmp $out cmp/$out"
+    run "../read_write_gray_packed $i $in $out && cmp $out ../cmp/$out"
+done
+
+cd ..
+
+run ./generate_gray_packed
+for i in 1 2 4; do
+    out=gray_packed_$i.png.out
+    run "cmp $out cmp/$out"
 done
 
 run ./generate_palette

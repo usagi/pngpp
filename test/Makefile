@@ -77,7 +77,7 @@ test: all
 	./test.sh
 
 clean-tests-output:
-	rm -f *.out
+	rm -f *.out pngsuite/*.out
 
 .PHONY: all dist-copy-files \
   clean clean-targets \
