@@ -7,7 +7,7 @@ echo -n >test.log
 
 run() {
     tests=$(( $tests + 1 ))
-    if sh -c "( $1 ) >>test.log 2>&1"; then
+    if sh -c "( $* ) >>test.log 2>&1"; then
         echo -n '.'
     else
         fails=$(( $fails + 1 ))
@@ -15,23 +15,20 @@ run() {
     fi
 }
 
-cd pngsuite
-for i in *.png; do
+for i in pngsuite/*.png; do
     for j in RGB RGBA GRAY GA; do
 	for k in 8 16; do
 	    out=$i.$j.$k.out
-	    run "../convert_color_space $j $k $i $out && cmp $out ../cmp/$out"
+	    run "./convert_color_space $j $k $i $out && cmp $out cmp/$out"
 	done;
     done;
 done
 
 for i in 1 2 4; do
-    in=basn0g0$i.png
+    in=pngsuite/basn0g0$i.png
     out=$in.out
-    run "../read_write_gray_packed $i $in $out && cmp $out ../cmp/$out"
+    run "./read_write_gray_packed $i $in $out && cmp $out cmp/$out"
 done
-
-cd ..
 
 run ./generate_gray_packed
 for i in 1 2 4; do
@@ -51,7 +48,7 @@ run "./write_gray_16 && cmp gray_16.out cmp/gray_16.out"
 echo "\n=================="
 
 if [ $fails -eq 0 ]; then
-    echo "PNG++ passes tests ($tests passed)"
+    echo "PNG++ passes tests (all $tests passed)"
     test -s test.log && echo "warning: test.log is not empty\n"
     exit 0
 else
