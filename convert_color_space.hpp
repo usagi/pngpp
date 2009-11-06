@@ -74,17 +74,24 @@ namespace png
             static void expand_8_to_16(png_struct*, png_row_info* row_info,
                                        byte* row)
             {
-//                dump_row(row, row_info->rowbytes);
-
+#ifdef DEBUG_EXPAND_8_16
+                printf("row: width=%d, bytes=%d, channels=%d\n",
+                       row_info->width, row_info->rowbytes, row_info->channels);
+                printf("<= ");
+                dump_row(row, row_info->rowbytes);
+#endif
                 for (size_t i = row_info->rowbytes; i-- > 0; )
                 {
-                    row[i*2 + 1] = row[i];
-                    row[i*2 + 0] = 0;
+                    row[2*i + 1] = row[i];
+                    row[2*i + 0] = 0;
                 }
-
-//                dump_row(row, 2*row_info->rowbytes);
+#ifdef DEBUG_EXPAND_8_16
+                printf("=> ");
+                dump_row(row, 2*row_info->rowbytes);
+#endif
             }
 
+#ifdef DEBUG_EXPAND_8_16
             static void dump_row(byte const* row, size_t width)
             {
                 printf("{");
@@ -94,6 +101,7 @@ namespace png
                 }
                 printf(" }\n");
             }
+#endif
 
             template< class reader >
             static void handle_16(reader& io)
@@ -124,9 +132,10 @@ namespace png
             template< class reader >
             static void handle_alpha(reader& io, uint_32 filler)
             {
-                bool src_alpha = io.get_color_type() & color_mask_alpha;
+                bool src_alpha = (io.get_color_type() & color_mask_alpha);
+                bool src_tRNS = io.has_chunk(chunk_tRNS);
                 bool dst_alpha = traits::get_color_type() & color_mask_alpha;
-                if (src_alpha && !dst_alpha)
+                if ((src_alpha || src_tRNS) && !dst_alpha)
                 {
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
                     io.set_strip_alpha();
@@ -139,8 +148,7 @@ namespace png
                 if (!src_alpha && dst_alpha)
                 {
 #if defined(PNG_tRNS_SUPPORTED) && defined(PNG_READ_EXPAND_SUPPORTED)
-                    if ((io.get_color_type() & color_mask_palette)
-                        && io.has_chunk(chunk_tRNS))
+                    if (src_tRNS)
                     {
                         io.set_tRNS_to_alpha();
                         return;
