@@ -88,7 +88,7 @@ namespace png
 
         void write_png() const
         {
-            if (setjmp(m_png->jmpbuf))
+            if (setjmp(png_jmpbuf(m_png)))
             {
                 throw error(m_error);
             }
@@ -103,7 +103,7 @@ namespace png
          */
         void write_info() const
         {
-            if (setjmp(m_png->jmpbuf))
+            if (setjmp(png_jmpbuf(m_png)))
             {
                 throw error(m_error);
             }
@@ -115,7 +115,7 @@ namespace png
          */
         void write_row(byte* bytes)
         {
-            if (setjmp(m_png->jmpbuf))
+            if (setjmp(png_jmpbuf(m_png)))
             {
                 throw error(m_error);
             }
@@ -127,7 +127,7 @@ namespace png
          */
         void write_end_info() const
         {
-            if (setjmp(m_png->jmpbuf))
+            if (setjmp(png_jmpbuf(m_png)))
             {
                 throw error(m_error);
             }

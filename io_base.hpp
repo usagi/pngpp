@@ -447,7 +447,7 @@ namespace png
 
         void raise_error()
         {
-            longjmp(m_png->jmpbuf, -1);
+            longjmp(png_jmpbuf(m_png), -1);
         }
 
         static void raise_error(png_struct* png, char const* message)
