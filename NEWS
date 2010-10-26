@@ -1,3 +1,15 @@
+Version 0.2.5:
+
+  - Fixed compatibility with newer libpng versions (>= 1.4)
+
+  - Fixed compilation on FreeBSD.
+
+  - Fixed tRNS handling with transformations.
+
+  - Added IO transformation debugging facility.
+
+  - Better organized test suite.
+
 Version 0.2.3:
 
   - Fixed numerous `already defined' errors due to require_color_space

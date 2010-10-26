@@ -64,9 +64,8 @@ all: $(deps) $(targets)
 
 dist-copy-files:
 	mkdir $(dist_dir)/test
-	cp $(sources) Makefile test.sh README *.png $(dist_dir)/test
-	mkdir $(dist_dir)/test/cmp
-	cp cmp/*.out $(dist_dir)/test/cmp
+	cp -r $(sources) Makefile test.sh README cmp $(dist_dir)/test
+	tar cf - pngsuite --exclude=\*.out | tar xf - -C $(dist_dir)/test
 
 clean: clean-targets clean-tests-output clean-deps
 

@@ -30,7 +30,7 @@
 #
 
 # don't forget to update version before releasing!
-version := 0.2.3
+version := 0.2.5
 
 ifndef PREFIX
 PREFIX := /usr/local
