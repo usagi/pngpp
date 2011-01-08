@@ -115,7 +115,10 @@ test-compile-headers: *.hpp
 	rm -f *.hpp.o *.hpp.cpp
 
 docs:
+	sed -e 's/@VERSION@/$(version)/g' -i.nover png.hpp Doxyfile
 	doxygen
+	mv png.hpp.nover png.hpp
+	mv Doxyfile.nover Doxyfile
 
 docs-clean:
 	rm -rf doc
