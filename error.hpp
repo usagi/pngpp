@@ -35,6 +35,7 @@
 #include <stdexcept>
 #include <cerrno>
 #include <cstdlib>
+#include <cstring>
 
 namespace png
 {
