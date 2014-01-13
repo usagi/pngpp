@@ -18,9 +18,11 @@ run() {
 for i in pngsuite/*.png; do
     for j in RGB RGBA GRAY GA; do
 	for k in 8 16; do
+    for p in PB PB2; do
 	    out=$i.$j.$k.out
-	    run "./convert_color_space $j $k $i $out && cmp $out cmp/$out"
+	    run "./convert_color_space $j $k $p $i $out && cmp $out cmp/$out"
 	done;
+    done;
     done;
 done
 
