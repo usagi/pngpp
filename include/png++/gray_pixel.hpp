@@ -1,0 +1,1 @@
+../../gray_pixel.hpp
